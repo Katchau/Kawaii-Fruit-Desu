@@ -5,7 +5,7 @@ types
 instance variables
   product:set of (Product);
   content:int;
-  totalWeight:?;
+  totalWeight: map Product to int;
   size:BasketType;
 
 operations

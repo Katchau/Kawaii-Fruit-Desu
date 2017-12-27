@@ -1,8 +1,8 @@
 class Farmer
 instance variables
   name:seq of (char);
-  products:seq of (char);
-  production:seq of (char);
+  products: map String to int; -- os que a coop pede
+  production: map String to int;
   collective:Collective;
 
 operations
