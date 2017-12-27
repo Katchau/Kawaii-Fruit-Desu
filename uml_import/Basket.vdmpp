@@ -1,0 +1,29 @@
+class Basket
+types
+	BasketType = <Big> | <Small>;
+
+instance variables
+  product:set of (Product);
+  content:int;
+  totalWeight:?;
+  size:BasketType;
+
+operations
+  public  add : seq of (char) * int ==> bool
+  add(prod, gr) ==
+    is not yet specified;
+
+  public  remove : Product ==> bool
+  remove(prod) ==
+    is not yet specified;
+
+  public  getQuantity : Product ==> bool
+  getQuantity(prod) ==
+    is not yet specified;
+
+  public  getTotalFruits : ()  ==> seq of (char)
+  getTotalFruits() ==
+    is not yet specified;
+
+
+end Basket

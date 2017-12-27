@@ -1,0 +1,22 @@
+class Farmer
+instance variables
+  name:seq of (char);
+  products:seq of (char);
+  production:seq of (char);
+  collective:Collective;
+
+operations
+  public  apply : ()  ==> bool
+  apply() ==
+    is not yet specified;
+
+  public  quit : ()  ==> ?
+  quit() ==
+    is not yet specified;
+
+  public  requestProduction : Product * int ==> int
+  requestProduction(prod, quantity) ==
+    is not yet specified;
+
+
+end Farmer

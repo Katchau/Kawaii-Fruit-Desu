@@ -1,0 +1,6 @@
+class Utils
+instance variables
+  String:seq of (char);
+  Stack:seq of (char);
+
+end Utils

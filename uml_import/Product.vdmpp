@@ -1,0 +1,11 @@
+class Product
+instance variables
+  name:seq of (char);
+
+operations
+  public  is_equal : Product ==> bool
+  is_equal(prod) ==
+    is not yet specified;
+
+
+end Product
