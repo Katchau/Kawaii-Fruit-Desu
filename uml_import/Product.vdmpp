@@ -1,6 +1,6 @@
 class Product
 instance variables
-  name:seq of (char);
+  name: Utils`string;
 
 operations
   public  is_equal : Product ==> bool

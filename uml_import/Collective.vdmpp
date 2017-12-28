@@ -4,7 +4,7 @@ instance variables
   farmer:set of (Farmer);
   waiting:set of (Client);
   basket:set of (Basket);
-  location:seq of (char);
+  location: Utils`string;
   smallBaskets:int;
   bigBaskets:int;
   productsCoiso: map Product to nat;
