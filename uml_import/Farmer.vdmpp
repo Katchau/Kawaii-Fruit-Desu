@@ -1,22 +1,50 @@
 class Farmer
+types
+	public ProdGrams = map Product to nat1;
+	 -- inv ProdGrams == not exists p1, p2 in set dom ProdGrams & p1 <> p2 and p1.is_equal(p2); -- kek ver isto
 instance variables
 	name: Utils`string;
-  products: map Utils`string to int; -- os que a coop pede
-  production: map Utils`string to int;
+  production: ProdGrams; -- products and the corresponding production of it
   collective:Collective;
 
 operations
+	public Farmer: Utils`string * ProdGrams ==> Farmer
+		Farmer(n, prods) == (
+			name := n;
+			production := prods;
+			collective := undefined;
+			return self
+		)
+	pre prods <> {|->} and forall gr in set rng prods & gr > 0 -- ñ é preciso pq é nat1 xD
+	post name = n and prods = production;
+
   public  apply : ()  ==> bool
-  apply() ==
-    is not yet specified;
+  	apply() ==
+    	is not yet specified;
 
   public  quit : ()  ==> ?
-  quit() ==
-    is not yet specified;
+  	quit() ==
+    	is not yet specified;
+    
+  public addProduct: Product * nat1 ==> ()
+  	addProduct(prod, gr) == production := production ++ {prod |-> gr}
+  	pre prod not in set dom production and gr > 0 -- ñ é preciso isto é nat1 xD
+  	post production = production~ ++ {prod |-> gr} and prod in set dom production and gr = production(prod);
 
-  public  requestProduction : Product * int ==> int
-  requestProduction(prod, quantity) ==
-    is not yet specified;
+	public removeProduct: Product ==> ()
+		removeProduct(prod) == production := {prod} <-: production
+		pre prod in set dom production
+		post production = {prod} <-: production~ and prod not in set dom production;
+
+  public  requestProduction : Product * nat1 ==> nat1
+  	requestProduction(prod, quantity) == 
+  		if quantity < production(prod) then return quantity
+  		else return production(prod)
+  	pre prod in set dom production and quantity > 0
+  	post RESULT <= production(prod) and RESULT <= quantity and
+  		if quantity < production(prod) then RESULT = quantity
+  		else RESULT = production(prod);
+  	
 
 
 end Farmer

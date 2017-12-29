@@ -1,13 +1,11 @@
 class Client
-types
-	BasketType = <Big> | <Small>;
 instance variables
-  name:seq of (char);
+  name: Utils`string;
   hasPaidAnual:bool;
   hasCollected:bool;
   hasCancelled:bool;
   collective:Collective;
-  basketRequest:BasketType;
+  basketRequest:Utils`BasketType;
 
 operations
   public  applyCollective : ()  ==> bool
