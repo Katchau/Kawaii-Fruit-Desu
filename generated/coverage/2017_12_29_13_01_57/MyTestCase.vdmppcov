@@ -1,0 +1,34 @@
+class MyTestCase
+operations
+	public MyTestCase: () ==> MyTestCase
+		MyTestCase() == return self;
+	public testeCancro1: () ==> bool
+		testeCancro1() == (
+			dcl prod1: Product := new Product("banana");
+			dcl prod2: Product := new Product("apple");
+			return prod1.is_equal(prod2);
+		);
+		
+		public testSameProd: () ==> bool
+		testSameProd() == (
+			dcl prod1: Product := new Product("banana");
+			dcl prod2: Product := new Product("banana");
+			return prod1.is_equal(prod2);
+		);
+		
+		public testBasketQuant: () ==> int
+		testBasketQuant() == (
+		  dcl prod1: Product := new Product("banana");
+			dcl prod2: Product := new Product("apple");
+			dcl bsk: Basket := new Basket({prod1, prod2}, 1, {prod1 |-> 2, prod2 |-> 3}, <Big>);
+			return bsk.getQuantity(prod1);
+		);
+		public testBasketFruits: () ==> set of Product
+		testBasketFruits() == (
+		  dcl prod1: Product := new Product("banana");
+			dcl prod2: Product := new Product("apple");
+			dcl bsk: Basket := new Basket({prod1, prod2}, 1, {prod1 |-> 2, prod2 |-> 3}, <Big>);
+			return bsk.getTotalFruits();
+		);
+	
+end MyTestCase
