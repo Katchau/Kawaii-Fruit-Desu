@@ -1,12 +1,16 @@
 class Collective
 instance variables
-  client: set of Client := {};
-  farmer: set of Farmer := {};
+  clients: set of Client := {};
+  farmers: set of Farmer := {};
   waiting: set of Client := {};
-  basket: set of Basket := {};
+  baskets: set of Basket := {};
   location: Utils`string;
   smallBaskets: nat := 0;
+  maxSmallBaskets: nat := 0;
+  inv smallBaskets <= maxSmallBaskets;
   bigBaskets: nat := 0;
+  maxBigBaskets: nat := 0;
+  inv bigBaskets <= maxBigBaskets;
   prodAvailability: Utils`ProdGrams; -- indica a disponibilidade de producao em gramas de cada produto
 
 operations
@@ -14,26 +18,50 @@ operations
 	public Collective: Utils`string ==> Collective
 		Collective(loc) == (
 			location:= loc;
+			prodAvailability := {|->};
 			return self;
 		)
 		pre len loc > 0
-		post location = loc; -- TODO ver se é preciso verificar os outros
+		post location = loc and prodAvailability = {|->}; -- TODO ver se é preciso verificar os outros
 
   public addAssociate : seq of (char) ==> bool
   addAssociate(cli) ==
     is not yet specified;
 
-  public removeAssociate : Client ==> ?
+  public removeAssociate : Client ==> ()
   removeAssociate(cli) ==
     is not yet specified;
 
-  public addFarmer : Farmer ==> bool
-  addFarmer(farmer) ==
-    is not yet specified;
+  public addFarmer : Farmer ==> ()
+  	addFarmer(farmer) == (
+  		farmers := farmers union {farmer};
+  		for all prod in set dom farmer.production do (
+  			if prod not in set dom prodAvailability
+  			then prodAvailability := prodAvailability ++ {prod |-> farmer.production(prod)}
+  			else prodAvailability := prodAvailability ++ {prod |-> farmer.production(prod)+prodAvailability(prod)}
+  		);
+  	)
+  	pre farmer not in set farmers
+  	post farmer in set farmers and farmers = farmers~ union {farmer}
+  		and forall prod in set dom farmer.production & prod in set dom prodAvailability and
+  		if prod not in set dom prodAvailability~
+  		then prodAvailability(prod) = farmer.production(prod)
+  		else prodAvailability(prod) = farmer.production(prod)+prodAvailability~(prod);
 
-  public removeFarmer : Farmer ==> ?
-  removeFarmer(farmer) ==
-    is not yet specified;
+  public removeFarmer : Farmer ==> ()
+  	removeFarmer(farmer) == ( 
+  		farmers := farmers \ {farmer};
+  		for all prod in set dom farmer.production do(
+  			if prodAvailability(prod) = farmer.production(prod)
+  			then prodAvailability := {prod} <-: prodAvailability
+  			else prodAvailability := prodAvailability ++ {prod |-> prodAvailability(prod) - farmer.production(prod)};
+  		);
+  	)
+  	pre farmer in set farmers
+  	post farmer not in set farmers and farmers = farmers~ \ {farmer}
+  		and forall prod in set dom farmer.production & if prodAvailability~(prod) = farmer.production(prod)
+  		then prod not in set dom prodAvailability
+  		else prodAvailability(prod) = prodAvailability~(prod) - farmer.production(prod);
 
   public  updateRequests : ()  ==> ?
   updateRequests() ==

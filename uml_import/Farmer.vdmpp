@@ -1,7 +1,7 @@
 class Farmer
 instance variables
 	name: Utils`string;
-  production: Utils`ProdGrams; -- products and the corresponding production of it
+  public production: Utils`ProdGrams; -- products and the corresponding production of it
   --collective:Collective;
 
 operations
@@ -11,7 +11,7 @@ operations
 			production := prods;
 			return self
 		)
-	pre prods <> {|->} and forall gr in set rng prods & gr > 0 -- ñ é preciso pq é nat1 xD
+	pre prods <> {|->} and forall gr in set rng prods & gr > 0
 	post name = n and prods = production;
 
   public  apply : ()  ==> bool
@@ -24,7 +24,7 @@ operations
     
   public addProduct: Product * nat1 ==> ()
   	addProduct(prod, gr) == production := production ++ {prod |-> gr}
-  	pre prod not in set dom production and gr > 0 -- ñ é preciso isto é nat1 xD
+  	pre prod not in set dom production and gr > 0
   	post production = production~ ++ {prod |-> gr} and prod in set dom production and gr = production(prod);
 
 	public removeProduct: Product ==> ()
