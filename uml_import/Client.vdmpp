@@ -1,14 +1,22 @@
 class Client
 instance variables
   name: Utils`string;
-  hasPaidAnual:bool;
-  hasCollected:bool;
-  hasCancelled:bool;
-  collective:Collective;
-  basketRequest:Utils`BasketType;
+  hasPaidAnual: bool;
+  hasCollected: bool;
+  hasCancelled: bool;
+  collective: Collective;
+  basketRequest: Utils`BasketType;
 
 operations
-  public  applyCollective : ()  ==> bool
+	public Client: Utils`string * Utils`BasketType ==> Client
+		Client(n, type) == (
+			name := n;
+			basketRequest := type;
+		)
+		pre len n > 0
+		post name = n and basketRequest = type;
+
+  public applyCollective : ()  ==> bool
   applyCollective() ==
     is not yet specified;
 

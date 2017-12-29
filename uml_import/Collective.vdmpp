@@ -1,13 +1,13 @@
 class Collective
 instance variables
-  client:set of (Client);
-  farmer:set of (Farmer);
-  waiting:set of (Client);
-  basket:set of (Basket);
+  client: set of Client;
+  farmer: set of Farmer;
+  waiting: set of Client;
+  basket: set of Basket;
   location: Utils`string;
-  smallBaskets:int;
-  bigBaskets:int;
-  productsCoiso: map Product to nat;
+  smallBaskets: nat1;
+  bigBaskets: nat1;
+  prodAvailability: map Product to nat1;
 
 operations
   public  addAssociate : seq of (char) ==> bool

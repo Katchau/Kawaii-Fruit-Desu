@@ -2,10 +2,12 @@ class MyTestCase
 operations
 	public MyTestCase: () ==> MyTestCase
 		MyTestCase() == return self;
-	public testeCancro1: () ==> bool
+	public testeCancro1: () ==> nat1
 		testeCancro1() == (
 			dcl prod1: Product := new Product("banana");
 			dcl prod2: Product := new Product("apple");
-			return prod1.is_equal(prod2);
+			dcl farm1: Farmer := new Farmer("Gay", {prod1 |-> 100});
+			farm1.addProduct(prod2,69);
+			return farm1.requestProduction(prod2,120);
 		);
 end MyTestCase

@@ -1,18 +1,14 @@
 class Farmer
-types
-	public ProdGrams = map Product to nat1;
-	 -- inv ProdGrams == not exists p1, p2 in set dom ProdGrams & p1 <> p2 and p1.is_equal(p2); -- kek ver isto
 instance variables
 	name: Utils`string;
-  production: ProdGrams; -- products and the corresponding production of it
-  collective:Collective;
+  production: Utils`ProdGrams; -- products and the corresponding production of it
+  --collective:Collective;
 
 operations
-	public Farmer: Utils`string * ProdGrams ==> Farmer
+	public Farmer: Utils`string * Utils`ProdGrams ==> Farmer
 		Farmer(n, prods) == (
 			name := n;
 			production := prods;
-			collective := undefined;
 			return self
 		)
 	pre prods <> {|->} and forall gr in set rng prods & gr > 0 -- ñ é preciso pq é nat1 xD
@@ -36,7 +32,7 @@ operations
 		pre prod in set dom production
 		post production = {prod} <-: production~ and prod not in set dom production;
 
-  public  requestProduction : Product * nat1 ==> nat1
+  public requestProduction : Product * nat1 ==> nat1
   	requestProduction(prod, quantity) == 
   		if quantity < production(prod) then return quantity
   		else return production(prod)

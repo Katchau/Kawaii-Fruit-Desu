@@ -3,14 +3,18 @@ instance variables
   name: Utils`string;
 
 operations
-	public Product: Utils`string  ==> Product
+	public Product: Utils`string ==> Product
 	Product(n) == (
 		name := n;
 		return self
-	);
-
-  public  is_equal : Product ==> bool
-  is_equal(prod) == return prod.name = name;
+	)
+	pre len n > 0
+	post name = n;
+	
+  public pure is_equal : Product ==> bool
+  	is_equal(prod) == Utils`stringsEquals(name, prod.name)
+  	pre prod <> undefined
+  	post RESULT = Utils`stringsEquals(name, prod.name);
 
 
 end Product
