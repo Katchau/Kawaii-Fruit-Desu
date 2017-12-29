@@ -1,0 +1,28 @@
+class Client
+instance variables
+  name: Utils`string;
+  hasPaidAnual:bool;
+  hasCollected:bool;
+  hasCancelled:bool;
+  collective:Collective;
+  basketRequest:Utils`BasketType;
+
+operations
+  public  applyCollective : ()  ==> bool
+  applyCollective() ==
+    is not yet specified;
+
+  public  getBasket : ()  ==> bool
+  getBasket() ==
+    is not yet specified;
+
+  public  cancelBasket : ()  ==> ?
+  cancelBasket() ==
+    is not yet specified;
+
+  public  quitCollective : ()  ==> ?
+  quitCollective() ==
+    is not yet specified;
+
+
+end Client

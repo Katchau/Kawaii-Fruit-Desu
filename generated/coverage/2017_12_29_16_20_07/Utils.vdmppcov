@@ -1,0 +1,8 @@
+class Utils
+types
+  public string = seq of char;
+	public BasketType = <Big> | <Small>;
+functions
+	public stringsEquals: string * string -> bool
+	stringsEquals(s1,s2) == s1 = s2;
+end Utils

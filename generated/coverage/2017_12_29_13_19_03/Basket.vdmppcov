@@ -1,0 +1,40 @@
+class Basket
+
+instance variables
+  product:set of (Product);
+  content:int;
+  totalWeight: map Product to int;
+  size:Utils`BasketType;
+
+operations
+	public Basket: set of (Product) * int * map Product to int * Utils`BasketType  ==> Basket
+	Basket(prod, cont, tw, s) == (
+		product := prod;
+		content := cont;
+		totalWeight := tw;
+		size := s;
+		return self
+	);
+
+  public  add : Product * int ==> () -- por alteracao dos parametros no uml
+  add(prod, gr) == (
+    product := product union {prod};
+    totalWeight := totalWeight ++ {prod |-> (totalWeight(prod) + gr)};
+    --return true
+    );
+
+  public  remove : Product ==> bool
+  remove(prod) ==(
+  	product := product \ {prod};
+    totalWeight := {prod} <-: totalWeight;
+    return true
+	);
+
+  public  getQuantity : Product ==> int -- alterar return no uml
+  getQuantity(prod) == return totalWeight(prod);
+
+  public  getTotalFruits : ()  ==> set of Product
+  getTotalFruits() == return product;
+
+
+end Basket

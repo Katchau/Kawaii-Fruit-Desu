@@ -1,0 +1,34 @@
+class Collective
+instance variables
+  client:set of (Client);
+  farmer:set of (Farmer);
+  waiting:set of (Client);
+  basket:set of (Basket);
+  location: Utils`string;
+  smallBaskets:int;
+  bigBaskets:int;
+  productsCoiso: map Product to nat;
+
+operations
+  public  addAssociate : seq of (char) ==> bool
+  addAssociate(cli) ==
+    is not yet specified;
+
+  public  removeAssociate : Client ==> ?
+  removeAssociate(cli) ==
+    is not yet specified;
+
+  public  addFarmer : Farmer ==> bool
+  addFarmer(farmer) ==
+    is not yet specified;
+
+  public  removeFarmer : Farmer ==> ?
+  removeFarmer(farmer) ==
+    is not yet specified;
+
+  public  updateRequests : ()  ==> ?
+  updateRequests() ==
+    is not yet specified;
+
+
+end Collective

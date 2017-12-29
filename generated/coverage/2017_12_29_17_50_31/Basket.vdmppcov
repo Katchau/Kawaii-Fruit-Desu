@@ -19,19 +19,21 @@ operations
   public  add : Product * int ==> () -- por alteracao dos parametros no uml -- alterar return no uml
 	  add(prod, gr) == (
 	    product := product union {prod};
-	    totalWeight := totalWeight ++ {prod |-> gr}
+	    if prod in set dom totalWeight 
+	    then totalWeight := totalWeight ++ {prod |-> (totalWeight(prod) + gr)}
+	    else totalWeight := totalWeight ++ {prod |-> gr}
 	    --return true
 	    )
-	pre  gr > 0 and prod not in set product -- ñ é preciso isto é nat1 xD
-	post prod in set dom totalWeight and prod in set product; 
+	  pre  gr > 0 and prod not in set product -- ñ é preciso isto é nat1 xD
+	  post prod in set dom totalWeight and prod in set product; 
 	  
 	  
   public  updateProductQuantity  : Product * int ==> () -- criar no uml
 	  updateProductQuantity(prod, gr) == (
 	  	totalWeight := totalWeight ++ {prod |-> (totalWeight(prod) + gr)}
 	  )
-  pre  gr >= 0 and prod in set product and prod in set dom totalWeight
-	post prod in set product and prod in set dom totalWeight and totalWeight(prod) = totalWeight~(prod) + gr;
+	  pre  gr >= 0 and prod in set product and prod in set dom totalWeight
+	  post prod in set product and prod in set dom totalWeight and totalWeight(prod) = totalWeight~(prod) + gr;
     
 
   public  remove : Product ==> () -- alterar return no uml
