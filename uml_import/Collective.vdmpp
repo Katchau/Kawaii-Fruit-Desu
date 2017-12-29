@@ -1,28 +1,37 @@
 class Collective
 instance variables
-  client: set of Client;
-  farmer: set of Farmer;
-  waiting: set of Client;
-  basket: set of Basket;
+  client: set of Client := {};
+  farmer: set of Farmer := {};
+  waiting: set of Client := {};
+  basket: set of Basket := {};
   location: Utils`string;
-  smallBaskets: nat1;
-  bigBaskets: nat1;
-  prodAvailability: map Product to nat1;
+  smallBaskets: nat := 0;
+  bigBaskets: nat := 0;
+  prodAvailability: Utils`ProdGrams; -- indica a disponibilidade de producao em gramas de cada produto
 
 operations
-  public  addAssociate : seq of (char) ==> bool
+
+	public Collective: Utils`string ==> Collective
+		Collective(loc) == (
+			location:= loc;
+			return self;
+		)
+		pre len loc > 0
+		post location = loc; -- TODO ver se é preciso verificar os outros
+
+  public addAssociate : seq of (char) ==> bool
   addAssociate(cli) ==
     is not yet specified;
 
-  public  removeAssociate : Client ==> ?
+  public removeAssociate : Client ==> ?
   removeAssociate(cli) ==
     is not yet specified;
 
-  public  addFarmer : Farmer ==> bool
+  public addFarmer : Farmer ==> bool
   addFarmer(farmer) ==
     is not yet specified;
 
-  public  removeFarmer : Farmer ==> ?
+  public removeFarmer : Farmer ==> ?
   removeFarmer(farmer) ==
     is not yet specified;
 
