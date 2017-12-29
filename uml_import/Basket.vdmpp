@@ -9,21 +9,34 @@ instance variables
   size:BasketType;
 
 operations
-  public  add : seq of (char) * int ==> bool
-  add(prod, gr) ==
-    is not yet specified;
+	private Basket: set of (Product) * int * map Product to int * BasketType  ==> Basket
+	Basket(prod, cont, tw, s) == (
+		product := prod;
+		content := cont;
+		totalWeight := tw;
+		size := s;
+		return self
+	);
+
+  public  add : Product * int ==> bool -- por alteracao dos parametros no uml
+  add(prod, gr) == (
+    product := product union {prod};
+    totalWeight := totalWeight ++ {prod |-> (totalWeight(prod) + gr)};
+    return true
+    );
 
   public  remove : Product ==> bool
-  remove(prod) ==
-    is not yet specified;
+  remove(prod) ==(
+  	product := product \ {prod};
+    totalWeight := {prod} <-: totalWeight;
+    return true
+	);
 
-  public  getQuantity : Product ==> bool
-  getQuantity(prod) ==
-    is not yet specified;
+  public  getQuantity : Product ==> int -- alterar return no uml
+  getQuantity(prod) == return totalWeight(prod);
 
-  public  getTotalFruits : ()  ==> seq of (char)
-  getTotalFruits() ==
-    is not yet specified;
+  public  getTotalFruits : ()  ==> set of Product
+  getTotalFruits() == return product;
 
 
 end Basket
