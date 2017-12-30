@@ -1,15 +1,15 @@
 class Basket
 
 instance variables
-  product:set of (Product);
-  content:int;
-  totalWeight: map Product to int;
-  size:Utils`BasketType;
+  public products:set of (Product);
+  public content:int;
+  public totalWeight: map Product to int;
+  public size:Utils`BasketType;
 
 operations
 	public Basket: set of (Product) * int * map Product to int * Utils`BasketType  ==> Basket
 	Basket(prod, cont, tw, s) == (
-		product := prod;
+		products := prod;
 		content := cont;
 		totalWeight := tw;
 		size := s;
@@ -18,39 +18,39 @@ operations
 
   public  add : Product * int ==> () -- por alteracao dos parametros no uml -- alterar return no uml
 	  add(prod, gr) == (
-	    product := product union {prod};
+	    products := products union {prod};
 	    totalWeight := totalWeight ++ {prod |-> gr}
 	    --return true
 	    )
-	pre  gr > 0 and prod not in set product -- ñ é preciso isto é nat1 xD
-	post prod in set dom totalWeight and prod in set product; 
+	pre  gr > 0 and prod not in set products -- ñ é preciso isto é nat1 xD
+	post prod in set dom totalWeight and prod in set products; 
 	  
 	  
   public  updateProductQuantity  : Product * int ==> () -- criar no uml
 	  updateProductQuantity(prod, gr) == (
 	  	totalWeight := totalWeight ++ {prod |-> (totalWeight(prod) + gr)}
 	  )
-  pre  gr >= 0 and prod in set product and prod in set dom totalWeight
-	post prod in set product and prod in set dom totalWeight and totalWeight(prod) = totalWeight~(prod) + gr;
+  pre  gr >= 0 and prod in set products and prod in set dom totalWeight
+	post prod in set products and prod in set dom totalWeight and totalWeight(prod) = totalWeight~(prod) + gr;
     
 
   public  remove : Product ==> () -- alterar return no uml
 	  remove(prod) ==(
-	  	product := product \ {prod};
+	  	products := products \ {prod};
 	    totalWeight := {prod} <-: totalWeight;
 	    --return true
 		)
-	pre prod in set product
-	post prod not in set product and prod not in set dom totalWeight ;
+	pre prod in set products
+	post prod not in set products and prod not in set dom totalWeight ;
 
   public  getQuantity : Product ==> int -- alterar return no uml
   	getQuantity(prod) == return totalWeight(prod)
-  pre prod in set product
-  post prod in set product and RESULT = totalWeight(prod);
+  pre prod in set products
+  post prod in set products and RESULT = totalWeight(prod);
 
   public  getTotalFruits : ()  ==> set of Product
-  	getTotalFruits() == return product
-  post RESULT = product;
+  	getTotalFruits() == return products
+  post RESULT = products;
 
 
 end Basket

@@ -1,0 +1,26 @@
+class ProductTest is subclass of MyTestCase
+instance variables
+	p1: Product := new Product("apple");
+	p2: Product := new Product("apple");
+operations
+  public testConstructor: () ==> ()
+  	testConstructor() == (
+    	assertEqual("apple", p1.name);
+    	IO`println("-- Passed constructor");
+  	);
+  
+  public testIsEqual: () ==> ()
+  	testIsEqual() == (
+  		assertTrue(p1.is_equal(p2));
+  		IO`println("-- Passed is_equal");
+  	);
+  	
+	public testAll: () ==> ()
+  	testAll() == (
+  		IO`println("Testing Product class functions");
+  		testConstructor();
+  		testIsEqual();
+  		IO`println("Product class passed all tests!");
+  	);
+
+end ProductTest

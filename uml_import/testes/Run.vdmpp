@@ -1,8 +1,10 @@
 class Run
 operations
 	public static main() == (
-      IO`println("Running tests...");
-      IO`println("Tests completed!");
-      new FarmerTest().testAll();
+     IO`println("Running tests...");
+     new FarmerTest().testAll();
+     new BasketTest().testAll();
+     new ProductTest().testAll();
+     IO`println("Tests completed!");
 	);
 end Run

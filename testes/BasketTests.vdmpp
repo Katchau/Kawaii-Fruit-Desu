@@ -1,0 +1,26 @@
+class BasketTests
+        instance variables
+                --b : Basket := new Basket({prod1}, 1, {prod1 |-> 2}, <Big>);
+        operations
+                private assertTrue: bool ==> ()
+                assertTrue(cond) == return
+                pre cond;
+                
+                private testCreateBasket: () ==> ()
+                testCreateBasket() ==
+                (
+                	dcl prod1: Product := new Product("banana");
+									dcl prod2: Product := new Product("apple");
+									
+									dcl b: Basket := new Basket({prod1, prod2}, 1, {prod1 |-> 2, prod2 |-> 3}, <Big>);
+									
+                  assertTrue(b.getTotalFruits = {prod1, prod2});
+                  
+                );
+                
+                public static main: () ==> ()
+                main() ==
+                (
+                        new StackTest().testPushPop();
+                );
+end BasketTests

@@ -1,0 +1,68 @@
+class BasketTest is subclass of MyTestCase
+instance variables
+	p1: Product := new Product("apple");
+	p2: Product := new Product("banana");
+	p3: Product := new Product("lettuce");
+	b: Basket := new Basket({p1,p2},20,{p1|->100, p2|->300}, <Big>);
+operations
+  public testConstructor: () ==> ()
+  	testConstructor() == (
+    	assertEqual({p1,p2}, b.products);
+    	assertEqual(20, b.content);
+    	assertEqual({p1|->100, p2|->300}, b.totalWeight);
+    	assertEqual(<Big>, b.size);
+    	IO`println("-- Passed constructor");
+  	);
+  
+  public testAddRemoveProduct: () ==> ()
+  	testAddRemoveProduct() == (
+  		assertEqual({p1,p2}, b.products);
+  		assertEqual({p1|->100, p2|->300}, b.totalWeight);
+  		
+  		-- add
+  		b.add(p3, 1000);
+  		assertTrue(p3 in set b.products);
+  		assertTrue(p3 in set dom b.totalWeight);
+  		assertEqual(1000, b.totalWeight(p3));
+  		assertEqual({p1|->100, p2|->300} ++ {p3 |-> 1000}, b.totalWeight);
+  		IO`println("-- Passed add new product to basket");
+  		
+  		-- remove
+  		b.remove(p3);
+  		assertTrue(p3 not in set b.products);
+  		assertTrue(p3 not in set dom b.totalWeight);
+  		IO`println("-- Passed remove from basket");
+  	);
+  	
+  public testUpdateProductQuantity: () ==> ()
+  	testUpdateProductQuantity() == (
+  		
+  		-- product already in basket
+  		b.updateProductQuantity(p2, 1000);
+  		assertTrue(p2 in set b.products);
+  		assertTrue(p2 in set dom b.totalWeight);
+  		assertEqual(1300, b.totalWeight(p2));
+  		assertEqual({p1|->100, p2|->1300}, b.totalWeight);
+  		IO`println("-- Passed update product quantity");
+  		
+  	);
+  	
+    public testBasketGets: () ==> ()
+  	testBasketGets() == (
+  		assertEqual(100, b.getQuantity(p1));
+  		assertEqual({p1,p2}, b.getTotalFruits());
+  		IO`println("-- Passed gets");
+  	);
+  
+
+	public testAll: () ==> ()
+  	testAll() == (
+  		IO`println("Testing Basket Class Functions");
+  		testConstructor();
+  		testBasketGets();
+  		testAddRemoveProduct();
+  		testUpdateProductQuantity();
+  		IO`println("Basket class passed all tests!");
+  	);
+
+end BasketTest
