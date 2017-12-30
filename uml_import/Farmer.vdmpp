@@ -1,6 +1,6 @@
 class Farmer
 instance variables
-	name: Utils`string;
+	public name: Utils`string;
   public production: Utils`ProdGrams; -- products and the corresponding production of it
   --collective:Collective;
 
@@ -22,7 +22,7 @@ operations
   	quit() ==
     	is not yet specified;
     
-  public addProduct: Product * nat1 ==> ()
+  public addProduct: Product * real ==> ()
   	addProduct(prod, gr) == production := production ++ {prod |-> gr}
   	pre prod not in set dom production and gr > 0
   	post production = production~ ++ {prod |-> gr} and prod in set dom production and gr = production(prod);

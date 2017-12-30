@@ -1,0 +1,8 @@
+class Run
+operations
+	public static main() == (
+      IO`println("Running tests...");
+      IO`println("Tests completed!");
+      new FarmerTest().testAll();
+	);
+end Run
