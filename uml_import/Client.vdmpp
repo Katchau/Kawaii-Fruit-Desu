@@ -1,11 +1,12 @@
 class Client
 instance variables
-  name: Utils`string;
+  public name: Utils`string;
   hasPaidAnual: bool;
   hasCollected: bool;
   hasCancelled: bool;
   collective: Collective;
-  basketRequest: Utils`BasketType;
+  basketReceived: Basket;
+  public basketRequest: Utils`BasketType;
 
 operations
 	public Client: Utils`string * Utils`BasketType ==> Client

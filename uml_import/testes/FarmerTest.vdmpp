@@ -1,0 +1,37 @@
+class FarmerTest is subclass of MyTestCase
+instance variables
+	product1: Product := new Product("apple");
+	product2: Product := new Product("banana");
+	production1: Utils`ProdGrams := {product1 |-> 1000};
+	farmer: Farmer := new Farmer("FarmBoy", production1);
+operations
+  public testConstructor: () ==> ()
+  	testConstructor() == (
+    	IO`println("Testing Constructor");
+    	assertEqual("FarmBoy", farmer.name);
+    	assertEqual(production1, farmer.production);
+    	assertTrue(forall gr in set rng farmer.production & gr > 0);
+  	);
+  
+  public testAddRemoveProduct: () ==> ()
+  	testAddRemoveProduct() == (
+  		IO`println("Testing Adding and removing products");
+  		assertEqual(production1, farmer.production);
+  		farmer.addProduct(product2, 1000);
+  		assertTrue(product2 in set dom farmer.production);
+  		assertEqual(1000, farmer.production(product2));
+  		assertEqual(production1 ++ {product2 |-> 1000}, farmer.production);
+  		
+  		farmer.removeProduct(product2);
+  		assertTrue(product2 not in set dom farmer.production);
+  		assertEqual(production1, farmer.production);
+  	);
+		
+	public testAll: () ==> ()
+  	testAll() == (
+  		IO`println("Testing Farmer Class Functions");
+  		testConstructor();
+  		testAddRemoveProduct();
+  	);
+
+end FarmerTest
