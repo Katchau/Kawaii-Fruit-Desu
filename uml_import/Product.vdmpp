@@ -1,6 +1,6 @@
 class Product
 instance variables
-  name: Utils`string;
+  public name: Utils`string;
 
 operations
 	public Product: Utils`string ==> Product
@@ -15,6 +15,6 @@ operations
   	is_equal(prod) == Utils`stringsEquals(name, prod.name)
   	pre prod <> undefined
   	post RESULT = Utils`stringsEquals(name, prod.name);
-
+  	
 
 end Product
