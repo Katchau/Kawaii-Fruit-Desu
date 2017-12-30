@@ -14,7 +14,7 @@ operations
 	pre prods <> {|->} and forall gr in set rng prods & gr > 0
 	post name = n and prods = production;
 
-  public  apply : ()  ==> bool
+  public apply : ()  ==> bool
   	apply() ==
     	is not yet specified;
 

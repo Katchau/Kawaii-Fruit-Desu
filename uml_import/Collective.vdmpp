@@ -1,4 +1,7 @@
 class Collective
+values
+	private minSmall = 7;
+	private minBig = 8;
 instance variables
   clients: set of Client := {};
   farmers: set of Farmer := {};
@@ -6,11 +9,11 @@ instance variables
   baskets: set of Basket := {};
   location: Utils`string;
   smallBaskets: nat := 0;
-  maxSmallBaskets: nat := 0;
-  inv smallBaskets <= maxSmallBaskets;
+  maxSmallBaskets: real := 0;
+  inv smallBaskets <= maxSmallBaskets and maxSmallBaskets >= 0;
   bigBaskets: nat := 0;
-  maxBigBaskets: nat := 0;
-  inv bigBaskets <= maxBigBaskets;
+  maxBigBaskets: real := 0;
+  inv bigBaskets <= maxBigBaskets and maxBigBaskets >= 0;
   prodAvailability: Utils`ProdGrams; -- indica a disponibilidade de producao em gramas de cada produto
 
 operations
@@ -62,6 +65,23 @@ operations
   		and forall prod in set dom farmer.production & if prodAvailability~(prod) = farmer.production(prod)
   		then prod not in set dom prodAvailability
   		else prodAvailability(prod) = prodAvailability~(prod) - farmer.production(prod);
+
+	public updateMaxBaskets: () ==> ()
+		updateMaxBaskets() == (
+			dcl numberProds: nat := card dom prodAvailability;
+			dcl sum: real := 0;
+			for all prod in set dom prodAvailability do (
+				sum := sum + prodAvailability(prod)
+			);
+			if numberProds >= minSmall and sum >= Utils`smallWeight
+			then maxSmallBaskets := sum / Utils`smallWeight
+			else maxSmallBaskets := 0;
+			if numberProds >= minBig and sum >= Utils`bigWeight
+			then maxBigBaskets := sum / Utils`bigWeight
+			else maxBigBaskets := 0;
+		)
+		pre prodAvailability <> {|->}
+		post maxSmallBaskets >= 0 and maxBigBaskets >= 0 and maxSmallBaskets >= 2 * maxBigBaskets;
 
   public  updateRequests : ()  ==> ?
   updateRequests() ==

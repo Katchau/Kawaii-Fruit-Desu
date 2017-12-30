@@ -1,8 +1,11 @@
 class Utils
+values
+	public bigWeight = 8000; -- gramas
+	public smallWeight = 4000;
 types
   public string = seq of char;
 	public BasketType = <Big> | <Small>;
-	public ProdGrams = map Product to nat1
+	public ProdGrams = map Product to real
 	inv ProdGrams == not exists p1, p2 in set dom ProdGrams & p1 <> p2 and p1.is_equal(p2); -- ver se é preciso isto
 functions
 	public stringsEquals: string * string -> bool

@@ -38,4 +38,14 @@ operations
 			cl.removeFarmer(farm2);
 			IO`println(cl);
 		);
+		public testeCancro4: () ==> ()
+		testeCancro4() == (
+			dcl map1: Utils`ProdGrams := {new Product("banana") |-> 1050, new Product("banana2") |-> 1000, new Product("banana3") |-> 1000, new Product("banana4") |-> 1000, new Product("banana5") |-> 1000, new Product("banana6") |-> 1000, new Product("banana7") |-> 1000, new Product("banana8") |-> 1000};
+			dcl farm1: Farmer := new Farmer("Gay", map1);
+			dcl cl: Collective := new Collective("Far far away land");
+			cl.addFarmer(farm1);
+			cl.updateMaxBaskets();
+			IO`println(cl);
+		);
+		
 end MyTestCase
