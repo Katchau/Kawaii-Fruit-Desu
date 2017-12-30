@@ -1,7 +1,7 @@
-class MyTestCase
+class Tests
 operations
-	public MyTestCase: () ==> MyTestCase
-		MyTestCase() == return self;
+	public Tests: () ==> Tests
+		Tests() == return self;
 	public testeCancro1: () ==> nat1
 		testeCancro1() == (
 			dcl prod1: Product := new Product("banana");
@@ -38,7 +38,7 @@ operations
 			cl.removeFarmer(farm2);
 			IO`println(cl);
 		);
-		-- create t := new MyTestCase() print t.testeCancro4()
+		-- create t := new Tests() print t.testeCancro4()
 		public testeCancro4: () ==> ()
 		testeCancro4() == (
 			dcl map1: Utils`ProdGrams := {new Product("banana") |-> 950, new Product("banana2") |-> 1000, new Product("banana3") |-> 1000, new Product("banana4") |-> 1000, new Product("banana5") |-> 1000, new Product("banana6") |-> 1000, new Product("banana7") |-> 1000, new Product("banana8") |-> 1000};
@@ -49,4 +49,18 @@ operations
 			IO`println(cl);
 		);
 		
-end MyTestCase
+		public testeCancro5: () ==> ()
+		testeCancro5() == (
+			dcl map1: Utils`ProdGrams := {new Product("banana") |-> 950, new Product("banana2") |-> 1000, new Product("banana3") |-> 1000, new Product("banana4") |-> 1000, new Product("banana5") |-> 1000, new Product("banana6") |-> 1000, new Product("banana7") |-> 1000, new Product("banana8") |-> 1000};
+			dcl farm1: Farmer := new Farmer("Gay", map1);
+			dcl cl: Collective := new Collective("Far far away land");
+			dcl cli: Client := new Client("Lol", <Small>);
+			cl.addFarmer(farm1);
+			cl.updateMaxBaskets();
+			IO`println(cl.addAssociate(cli));
+			IO`println(cl);
+			cl.removeAssociate(cli);
+			IO`println(cl);
+		);
+		
+end Tests

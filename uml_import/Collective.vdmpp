@@ -7,6 +7,7 @@ instance variables
   farmers: set of Farmer := {};
   waiting: set of Client := {};
   baskets: set of Basket := {};
+  inv forall cli in set clients & cli not in set waiting;
   location: Utils`string;
   smallBaskets: nat := 0;
   maxSmallBaskets: real := 0;
@@ -27,13 +28,45 @@ operations
 		pre len loc > 0
 		post location = loc and prodAvailability = {|->}; -- TODO ver se é preciso verificar os outros
 
-  public addAssociate : seq of (char) ==> bool
-  addAssociate(cli) ==
-    is not yet specified;
+  public addAssociate : Client ==> bool
+  	addAssociate(cli) == (
+  		if cli.basketRequest = <Small> and smallBaskets + 1 <= maxSmallBaskets
+  		then (
+  			smallBaskets := smallBaskets + 1;
+  			clients := clients union {cli};
+  			return true
+  		);
+  		if cli.basketRequest = <Big> and bigBaskets + 1 <= maxBigBaskets
+  		then (
+  			bigBaskets := bigBaskets + 1;
+  			clients := clients union {cli};
+  			return true
+  		);
+  		waiting := waiting union {cli};
+  		return false
+  	)
+  	pre cli not in set clients and cli not in set waiting
+  	post (cli in set clients or cli in set waiting) and
+  		if cli in set clients then (smallBaskets = smallBaskets~ + 1 or bigBaskets = bigBaskets~ + 1)
+  		else (smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~ and cli in set waiting);
 
   public removeAssociate : Client ==> ()
-  removeAssociate(cli) ==
-    is not yet specified;
+  	removeAssociate(cli) == (
+  		if cli in set waiting
+  		then (
+  			waiting := waiting \ {cli};
+  			return
+  		)
+  		else clients := clients \ {cli};
+  		if cli.basketRequest = <Small>
+  		then smallBaskets := smallBaskets - 1
+  		else bigBaskets := bigBaskets -1;
+  	)
+    pre cli in set clients or cli in set waiting
+    post cli not in set clients and cli not in set waiting and
+    	if cli in set clients~ and cli.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1
+    	else if cli in set clients~ and cli.basketRequest = <Big> then bigBaskets = bigBaskets~ - 1
+    	else smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~;
 
   public addFarmer : Farmer ==> ()
   	addFarmer(farmer) == (
