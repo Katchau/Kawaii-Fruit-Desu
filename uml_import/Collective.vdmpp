@@ -1,21 +1,25 @@
 class Collective
 values
-	private minSmall = 7;
-	private minBig = 8;
+	private basketSmall = 7;
+	private basketBig = 8;
+	private minSmall = Utils`smallWeight / basketSmall;
+	private minBig = Utils`bigWeight / basketBig;
 instance variables
-  clients: set of Client := {};
-  farmers: set of Farmer := {};
-  waiting: set of Client := {};
-  baskets: set of Basket := {};
-  inv forall cli in set clients & cli not in set waiting;
-  location: Utils`string;
-  smallBaskets: nat := 0;
-  maxSmallBaskets: real := 0;
-  inv smallBaskets <= maxSmallBaskets and maxSmallBaskets >= 0;
-  bigBaskets: nat := 0;
-  maxBigBaskets: real := 0;
-  inv bigBaskets <= maxBigBaskets and maxBigBaskets >= 0;
-  prodAvailability: Utils`ProdGrams; -- indica a disponibilidade de producao em gramas de cada produto
+  public clients: set of Client := {};
+  public farmers: set of Farmer := {};
+  public waiting: Stack := new Stack();
+  public baskets: set of Basket := {};
+  inv forall cli in set clients & cli not in set elems waiting.contents;
+  public location: Utils`string;
+  public smallBaskets: nat := 0;
+  public bigBaskets: nat := 0;
+  inv bigBaskets + smallBaskets = card clients;
+  public prodAvailability: Utils`ProdGrams; -- indica a disponibilidade de producao em gramas de cada produto
+  
+functions
+
+	public isProdAvailable: nat * nat * real -> bool
+		isProdAvailable(small,big,avail) == small * minSmall + big * minBig <= avail; 
 
 operations
 
@@ -27,47 +31,100 @@ operations
 		)
 		pre len loc > 0
 		post location = loc and prodAvailability = {|->}; -- TODO ver se é preciso verificar os outros
-
+	
+	public getClient: Utils`string ==> Client
+		getClient(cname) == (
+			dcl cli: Client;
+			for all c in set clients do if Utils`stringsEquals(c.name, cname) then cli:= c;
+			return cli;
+		)
+		pre exists1 cli in set clients & cli.name = cname
+		post RESULT.name = cname and RESULT in set clients;
+	
+	public canAddAssociate : nat * nat * nat1 ==> bool
+		canAddAssociate(small, big, minNumber) == (
+			dcl sum: nat := 0;
+			for all prod in set dom prodAvailability do (
+				if isProdAvailable(small,big,prodAvailability(prod)) then sum := sum + 1;
+			);
+			return sum >= minNumber
+		)
+		pre small + big > 0;
+	
   public addAssociate : Client ==> bool
   	addAssociate(cli) == (
-  		if cli.basketRequest = <Small> and smallBaskets + 1 <= maxSmallBaskets
+  		if cli.basketRequest = <Small> and canAddAssociate(smallBaskets +1, bigBaskets, basketSmall)
   		then (
   			smallBaskets := smallBaskets + 1;
   			clients := clients union {cli};
   			return true
   		);
-  		if cli.basketRequest = <Big> and bigBaskets + 1 <= maxBigBaskets
+  		if cli.basketRequest = <Big> and canAddAssociate(smallBaskets, bigBaskets + 1, basketBig)
   		then (
   			bigBaskets := bigBaskets + 1;
   			clients := clients union {cli};
   			return true
   		);
-  		waiting := waiting union {cli};
+  		waiting.push(cli);
   		return false
   	)
-  	pre cli not in set clients and cli not in set waiting
-  	post (cli in set clients or cli in set waiting) and
+  	pre cli not in set clients and cli not in set elems waiting.contents
+  	post (if RESULT then cli in set clients else cli in set elems waiting.contents) and
   		if cli in set clients then (smallBaskets = smallBaskets~ + 1 or bigBaskets = bigBaskets~ + 1)
-  		else (smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~ and cli in set waiting);
+  		else (smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~ and cli in set elems waiting.contents);
 
   public removeAssociate : Client ==> ()
   	removeAssociate(cli) == (
-  		if cli in set waiting
-  		then (
-  			waiting := waiting \ {cli};
-  			return
-  		)
-  		else clients := clients \ {cli};
+  		clients := clients \ {cli};
   		if cli.basketRequest = <Small>
   		then smallBaskets := smallBaskets - 1
   		else bigBaskets := bigBaskets -1;
   	)
-    pre cli in set clients or cli in set waiting
-    post cli not in set clients and cli not in set waiting and
+    pre cli in set clients and cli not in set elems waiting.contents
+    post cli not in set clients and
     	if cli in set clients~ and cli.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1
     	else if cli in set clients~ and cli.basketRequest = <Big> then bigBaskets = bigBaskets~ - 1
     	else smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~;
-
+	
+	public addFromWaitingList: () ==> bool
+		addFromWaitingList() == (
+			dcl nextCli: Client := waiting.top();
+			dcl hasFreeSpace: bool := false;
+			
+			if nextCli.basketRequest = <Small>
+			then hasFreeSpace := canAddAssociate(smallBaskets +1, bigBaskets, basketSmall)
+			else hasFreeSpace := canAddAssociate(smallBaskets, bigBaskets + 1, basketBig);
+			
+			if hasFreeSpace
+			then ( 
+				waiting.pop();
+				return addAssociate(nextCli)
+			)
+			else return false;
+		)
+		pre clients <> {} and waiting.contents <> []
+		post if RESULT 
+			then (waiting.contents = tl waiting~.contents and hd waiting~.contents in set clients )
+			else ( waiting.contents = waiting~.contents and clients~ = clients );
+	
+	-- remover clientes em excesso
+	--public removeExtraClients: () ==> ()
+		--removeExtraClients() == (
+			--for all cli in set clients do (
+				--if not hasFreeSpace(clients.basketRequest)
+				--then 
+			--)
+		--);
+	
+	public getFarmer: Utils`string ==> Farmer
+		getFarmer(fname) == (
+			dcl farmer: Farmer;
+			for all f in set farmers do if Utils`stringsEquals(f.name, fname) then farmer:= f;
+			return farmer;
+		)
+		pre exists1 farmer in set farmers & farmer.name = fname
+		post RESULT.name = fname and RESULT in set farmers;
+	
   public addFarmer : Farmer ==> ()
   	addFarmer(farmer) == (
   		farmers := farmers union {farmer};
@@ -98,23 +155,6 @@ operations
   		and forall prod in set dom farmer.production & if prodAvailability~(prod) = farmer.production(prod)
   		then prod not in set dom prodAvailability
   		else prodAvailability(prod) = prodAvailability~(prod) - farmer.production(prod);
-
-	public updateMaxBaskets: () ==> ()
-		updateMaxBaskets() == (
-			dcl numberProds: nat := card dom prodAvailability;
-			dcl sum: real := 0;
-			for all prod in set dom prodAvailability do (
-				sum := sum + prodAvailability(prod)
-			);
-			if numberProds >= minSmall and sum >= Utils`smallWeight
-			then maxSmallBaskets := sum / Utils`smallWeight
-			else maxSmallBaskets := 0;
-			if numberProds >= minBig and sum >= Utils`bigWeight
-			then maxBigBaskets := sum / Utils`bigWeight
-			else maxBigBaskets := 0;
-		)
-		pre prodAvailability <> {|->}
-		post maxSmallBaskets >= 0 and maxBigBaskets >= 0 and maxSmallBaskets >= 2 * maxBigBaskets;
 
   public  updateRequests : ()  ==> ?
   updateRequests() ==

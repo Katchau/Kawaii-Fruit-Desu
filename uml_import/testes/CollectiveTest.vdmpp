@@ -1,0 +1,73 @@
+class CollectiveTest is subclass of MyTestCase
+instance variables
+	map1: Utils`ProdGrams := {new Product("banana") |-> 1000, new Product("apple") |-> 1000, new Product("orange") |-> 1000, new Product("pear") |-> 1000, new Product("tomato") |-> 1000, new Product("mango") |-> 1000, new Product("onion") |-> 1000, new Product("troncha") |-> 1000};
+	map2: Utils`ProdGrams := {new Product("banana") |-> 1000, new Product("apple") |-> 1000, new Product("orange") |-> 1000, new Product("tomato") |-> 1000, new Product("pinneapple") |-> 1000, new Product("onion") |-> 1000, new Product("troncha") |-> 1000};
+	farmer1: Farmer := new Farmer("FarmBoy", map1);
+	farmer2: Farmer := new Farmer("FarmGirl", map1);
+	clName: Utils`string := "Gaia";
+	cl: Collective := new Collective(clName);
+operations
+  public testConstructor: () ==> ()
+  	testConstructor() == (
+    	IO`println("Testing Collective Constructor");
+    	assertTrue(len clName > 0);
+    	assertEqual(clName, cl.location);
+    	assertEqual({|->}, cl.prodAvailability);
+    	assertEqual({},cl.clients);
+    	assertEqual({},cl.farmers);
+    	assertEqual([], cl.waiting.contents);
+    	assertEqual({},cl.baskets);
+    	assertEqual(0,cl.smallBaskets);
+    	assertEqual(0,cl.bigBaskets);
+  	);
+  
+  public testAddFarmer: () ==> ()
+  	testAddFarmer() == (
+  		IO`println("Testing Adding Farmer");
+  		assertTrue(farmer1 not in set cl.farmers);
+  		assertTrue(farmer2 not in set cl.farmers);
+  		cl.addFarmer(farmer1);
+  		assertTrue(farmer1 in set cl.farmers);
+  		assertEqual({farmer1}, cl.farmers);
+  		assertEqual(farmer1.production, cl.prodAvailability);
+  		for all prod in set dom farmer1.production do (
+  			assertTrue(prod in set dom cl.prodAvailability);
+  			assertEqual(farmer1.production(prod), cl.prodAvailability(prod))
+  		);
+  		assertTrue(farmer2 not in set cl.farmers);
+  		cl.addFarmer(farmer2);
+  		assertTrue(farmer2 in set cl.farmers);
+			for all prod in set dom farmer2.production do (
+  			assertTrue(prod in set dom cl.prodAvailability);
+  			assertEqual(farmer1.production(prod)+farmer2.production(prod), cl.prodAvailability(prod))
+  		);
+  	);
+  
+  public testRemoveFarmer: () ==> ()
+  	testRemoveFarmer() == (
+  		IO`println("Testing Removing Farmer");
+  		assertTrue(farmer1 in set cl.farmers);
+  		assertTrue(farmer2 in set cl.farmers);
+  		cl.removeFarmer(farmer2);
+  		assertTrue(farmer2 not in set cl.farmers);
+  		assertEqual({farmer1}, cl.farmers);
+  		assertEqual(farmer1.production, cl.prodAvailability);
+  		for all prod in set dom farmer2.production do (
+  			-- both farmers havee the same products and production values, so removing one the production will be the same as one
+  			assertEqual(farmer1.production(prod), cl.prodAvailability(prod))
+  		);
+  		
+  		cl.removeFarmer(farmer1);
+  		assertTrue(farmer1 not in set cl.farmers);
+  		assertEqual({}, cl.farmers);
+  		assertEqual({|->}, cl.prodAvailability);
+  		assertTrue(forall prod in set dom farmer1.production & prod not in set dom cl.prodAvailability); 
+  	);
+  
+  public testAll: () ==> ()
+  	testAll() == (
+  		testConstructor();
+  		testAddFarmer();
+  		testRemoveFarmer();
+  	);
+end CollectiveTest

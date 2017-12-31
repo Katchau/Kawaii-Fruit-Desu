@@ -45,7 +45,6 @@ operations
 			dcl farm1: Farmer := new Farmer("Gay", map1);
 			dcl cl: Collective := new Collective("Far far away land");
 			cl.addFarmer(farm1);
-			cl.updateMaxBaskets();
 			IO`println(cl);
 		);
 		
@@ -56,7 +55,6 @@ operations
 			dcl cl: Collective := new Collective("Far far away land");
 			dcl cli: Client := new Client("Lol", <Small>);
 			cl.addFarmer(farm1);
-			cl.updateMaxBaskets();
 			IO`println(cl.addAssociate(cli));
 			IO`println(cl);
 			cl.removeAssociate(cli);
