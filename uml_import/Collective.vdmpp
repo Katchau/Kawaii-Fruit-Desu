@@ -3,19 +3,19 @@ values
 	private minSmall = 7;
 	private minBig = 8;
 instance variables
-  clients: set of Client := {};
-  farmers: set of Farmer := {};
-  waiting: set of Client := {};
-  baskets: set of Basket := {};
-  inv forall cli in set clients & cli not in set waiting;
-  location: Utils`string;
-  smallBaskets: nat := 0;
-  maxSmallBaskets: real := 0;
+  public clients: set of Client := {};
+  public farmers: set of Farmer := {};
+  public waiting: Stack := new Stack();
+  public baskets: set of Basket := {};
+  inv forall cli in set clients & cli not in set elems waiting.contents;
+  public location: Utils`string;
+  public smallBaskets: nat := 0;
+  public maxSmallBaskets: real := 0;
   inv smallBaskets <= maxSmallBaskets and maxSmallBaskets >= 0;
-  bigBaskets: nat := 0;
-  maxBigBaskets: real := 0;
+  public bigBaskets: nat := 0;
+  public maxBigBaskets: real := 0;
   inv bigBaskets <= maxBigBaskets and maxBigBaskets >= 0;
-  prodAvailability: Utils`ProdGrams; -- indica a disponibilidade de producao em gramas de cada produto
+  public prodAvailability: Utils`ProdGrams; -- indica a disponibilidade de producao em gramas de cada produto
 
 operations
 
@@ -42,32 +42,49 @@ operations
   			clients := clients union {cli};
   			return true
   		);
-  		waiting := waiting union {cli};
+  		waiting.push(cli);
   		return false
   	)
-  	pre cli not in set clients and cli not in set waiting
-  	post (cli in set clients or cli in set waiting) and
+  	pre cli not in set clients and cli not in set elems waiting.contents
+  	post (cli in set clients or cli in set elems waiting.contents) and
   		if cli in set clients then (smallBaskets = smallBaskets~ + 1 or bigBaskets = bigBaskets~ + 1)
-  		else (smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~ and cli in set waiting);
+  		else (smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~ and cli in set elems waiting.contents);
 
   public removeAssociate : Client ==> ()
   	removeAssociate(cli) == (
-  		if cli in set waiting
-  		then (
-  			waiting := waiting \ {cli};
-  			return
-  		)
-  		else clients := clients \ {cli};
+  		clients := clients \ {cli};
   		if cli.basketRequest = <Small>
   		then smallBaskets := smallBaskets - 1
   		else bigBaskets := bigBaskets -1;
   	)
-    pre cli in set clients or cli in set waiting
-    post cli not in set clients and cli not in set waiting and
+    pre cli in set clients and cli not in set elems waiting.contents
+    post cli not in set clients and
     	if cli in set clients~ and cli.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1
     	else if cli in set clients~ and cli.basketRequest = <Big> then bigBaskets = bigBaskets~ - 1
     	else smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~;
-
+	
+	public hasFreeSpace : Utils`BasketType ==> bool
+		hasFreeSpace(basketType) == (
+			if basketType = <Small>
+			then return smallBaskets + 1 <= maxSmallBaskets
+			else return bigBaskets + 1 <= maxBigBaskets
+		)
+		post if basketType = <Small>
+			then RESULT = smallBaskets + 1 <= maxSmallBaskets
+			else RESULT = bigBaskets + 1 <= maxBigBaskets;
+	
+	public updateWaitingList: () ==> bool
+		updateWaitingList() == (
+			dcl nextCli: Client := waiting.top();
+			if hasFreeSpace(nextCli.basketRequest)
+			then ( 
+				waiting.pop();
+				return addAssociate(nextCli)
+			)
+			else return false;
+		)
+		pre clients <> {} and waiting.contents <> [];
+	
   public addFarmer : Farmer ==> ()
   	addFarmer(farmer) == (
   		farmers := farmers union {farmer};

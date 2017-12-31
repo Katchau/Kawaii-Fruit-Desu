@@ -1,0 +1,27 @@
+class CollectiveTest is subclass of MyTestCase
+instance variables
+	map1: Utils`ProdGrams := {new Product("banana") |-> 1000, new Product("apple") |-> 1000, new Product("orange") |-> 1000, new Product("pear") |-> 1000, new Product("tomato") |-> 1000, new Product("mango") |-> 1000, new Product("onion") |-> 1000, new Product("troncha") |-> 1000};
+	map2: Utils`ProdGrams := {new Product("banana") |-> 1000, new Product("apple") |-> 1000, new Product("orange") |-> 1000, new Product("tomato") |-> 1000, new Product("pinneapple") |-> 1000, new Product("onion") |-> 1000, new Product("troncha") |-> 1000};
+	farmer1: Farmer := new Farmer("FarmBoy", map1);
+	cl: Collective := new Collective("Gaia");
+operations
+  public testConstructor: () ==> ()
+  	testConstructor() == (
+    	IO`println("Testing Collective Constructor");
+    	assertTrue(len "Gaia" > 0);
+    	assertEqual("Gaia", cl.location);
+    	assertEqual({|->}, cl.prodAvailability);
+    	assertEqual({},cl.clients);
+    	assertEqual({},cl.farmers);
+    	assertEqual({},cl.baskets);
+    	assertEqual(0,cl.smallBaskets);
+    	assertEqual(0,cl.maxSmallBaskets);
+    	assertEqual(0,cl.bigBaskets);
+    	assertEqual(0,cl.maxBigBaskets);
+  	);
+  	
+  public testAll: () ==> ()
+  	testAll() == (
+  		testConstructor();
+  	);
+end CollectiveTest

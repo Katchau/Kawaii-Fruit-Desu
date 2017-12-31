@@ -1,23 +1,20 @@
 class Stack
 instance variables
-	private contents : seq of int := [];
-	private capacity: nat;
-	inv len contents <= capacity;
+	public contents : seq of Client := [];
 operations
- 	public Stack: nat ==> Stack
- 		Stack(c) == (capacity := c; return self)
- 		post contents = [] and capacity = c;
+ 	public Stack: () ==> Stack
+ 		Stack() == return self
+ 		post contents = [];
  	public clear: () ==> ()
  		clear() == contents := [];
- 	public push: int ==> ()
+ 	public push: Client ==> ()
  		push(x) == contents := [x] ^ contents
- 		pre len contents < capacity
  		post contents = [x] ^ contents~;
  	public pop: () ==> ()
  		pop() == contents := tl contents
  		pre contents <> []
  		post contents = tl contents~;
- 	public top: () ==> int
+ 	public top: () ==> Client
  		top() == return hd contents
  		pre contents <> []
  		post RESULT = hd contents;
