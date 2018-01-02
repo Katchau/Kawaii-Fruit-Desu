@@ -8,7 +8,7 @@ instance variables
   public clients: set of Client := {};
   public farmers: set of Farmer := {};
   public waiting: Stack := new Stack();
-  public baskets: set of Basket := {};
+  public baskets: seq of Basket := [];
   inv forall cli in set clients & cli not in set elems waiting.contents;
   public location: Utils`string;
   public smallBaskets: nat := 0;
@@ -17,10 +17,6 @@ instance variables
   public prodAvailability: Utils`ProdGrams; -- indica a disponibilidade de producao em gramas de cada produto
   
 functions
-
-	public isProdAvailable: nat * nat * real -> bool
-		isProdAvailable(small,big,avail) == small * minSmall + big * minBig <= avail;
-		
 	public subtractMaps: Utils`ProdGrams * Utils`ProdGrams -> Utils`ProdGrams
 		subtractMaps(p1, p2) == if p1 = {|->} or dom p1 inter dom p2 = {} then {|->}
 			else let v in set (dom p1 inter dom p2) in ( p1 ++ {v |-> p1(v) - p2(v)}) ++ subtractMaps({v} <-: p1, {v} <-: p2)
@@ -89,22 +85,62 @@ operations
 			return ret
 		)
 		pre curProds <> {|->} and if basketType = <Small>
-			then Basket`getTotalWeight(curProds) + 2 >= Utils`smallWeight
-			else Basket`getTotalWeight(curProds) + 2 >= Utils`bigWeight;
+			then Basket`getTotalWeight(curProds) + 0.1 >= Utils`smallWeight
+			else Basket`getTotalWeight(curProds) + 0.1 >= Utils`bigWeight;
 	
-	public pure canAddAssociate : nat * nat * nat1 ==> bool
-		canAddAssociate(small, big, minNumber) == (
-			dcl sum: nat := 0;
-			for all prod in set dom prodAvailability do (
-				if isProdAvailable(small,big,prodAvailability(prod)) then sum := sum + 1;
+	public createBaskets: () ==> ()
+		createBaskets() == (
+		dcl curProds: Utils`ProdGrams := prodAvailability;
+		dcl basket: Basket;
+			for all cli in set clients do (
+				basket := generateBasket(cli.basketRequest, curProds);
+				baskets := baskets ^ [basket];
+				curProds := subtractMaps(curProds, basket.content)
 			);
-			return sum >= minNumber
+		)
+		pre smallBaskets + bigBaskets > 0
+		post baskets <> [] and card elems baskets = smallBaskets + bigBaskets;
+	 
+	public canAddAssociate: nat * nat ==> bool
+		canAddAssociate(small, big) == (
+			dcl curProds: Utils`ProdGrams := prodAvailability;
+			dcl i : nat1 := 1;
+			dcl validBaskets: nat := 0;
+			dcl basket: Basket;
+			while i <= small do (
+				i := i + 1;
+				if Basket`getTotalWeight(curProds) + 0.1 >= Utils`smallWeight
+				then (
+					basket := generateBasket(<Small>, curProds);
+					if card dom basket.content = basketSmall and
+					basket.totalWeight + 0.1 >= Utils`smallWeight and basket.totalWeight <= Utils`smallWeight + 0.1
+					then (
+						validBaskets := validBaskets + 1;
+						curProds := subtractMaps(curProds, basket.content);
+					)
+				);
+			);
+			i := 1;
+			while i <= big do (
+				i := i + 1;
+				if Basket`getTotalWeight(curProds) + 0.1 >= Utils`bigWeight
+				then (
+					basket := generateBasket(<Big>, curProds);
+					if card dom basket.content = basketBig and 
+					basket.totalWeight + 0.1 >= Utils`bigWeight and basket.totalWeight <= Utils`bigWeight + 0.1
+					then (
+						validBaskets := validBaskets + 1;
+						curProds := subtractMaps(curProds, basket.content);
+					)
+				);
+			);
+			return validBaskets = small + big
 		)
 		pre small + big > 0;
 	
   public addAssociate : Client ==> bool
   	addAssociate(cli) == (
-  		if cli.basketRequest = <Small> and canAddAssociate(smallBaskets +1, bigBaskets, basketSmall)
+  		if cli.basketRequest = <Small> and canAddAssociate(smallBaskets +1, bigBaskets)
   		then (
   			atomic(
   				clients := clients union {cli};
@@ -113,7 +149,7 @@ operations
   			cli.setUndefinedCollective(false);
   			return true
   		);
-  		if cli.basketRequest = <Big> and canAddAssociate(smallBaskets, bigBaskets + 1, basketBig)
+  		if cli.basketRequest = <Big> and canAddAssociate(smallBaskets, bigBaskets + 1)
   		then (
   			atomic(
   				clients := clients union {cli};
@@ -123,7 +159,6 @@ operations
   			return true
   		);
   		waiting.push(cli);
-  		IO`println("pushed");
   		return false
   	)
   	pre cli not in set clients 
@@ -157,8 +192,8 @@ operations
 			dcl hasFreeSpace: bool := false;
 			
 			if nextCli.basketRequest = <Small>
-			then hasFreeSpace := canAddAssociate(smallBaskets +1, bigBaskets, basketSmall)
-			else hasFreeSpace := canAddAssociate(smallBaskets, bigBaskets + 1, basketBig);
+			then hasFreeSpace := canAddAssociate(smallBaskets +1, bigBaskets)
+			else hasFreeSpace := canAddAssociate(smallBaskets, bigBaskets + 1);
 			
 			if hasFreeSpace
 			then ( 
@@ -180,7 +215,7 @@ operations
 				if cli.basketRequest = <Small>
 				then size := basketSmall
 				else size := basketBig;
-				if not canAddAssociate(smallBaskets, bigBaskets, size)
+				if not canAddAssociate(smallBaskets, bigBaskets)
 				then (
 					removeAssociate(cli);
 					waiting.push(cli)
@@ -188,12 +223,10 @@ operations
 			)
 		)
 		pre card clients > 0
-		post forall cli in set clients &
-			if cli in set elems waiting.contents and cli in set clients~
-			then if cli.basketRequest = <Small>
-				then not canAddAssociate(smallBaskets + 1, bigBaskets, basketSmall)
-				else not canAddAssociate(smallBaskets, bigBaskets +1, basketBig)
-			else true;
+		post forall cli in set clients~ &
+			if cli not in set elems waiting.contents
+			then cli in set clients
+			else cli in set elems waiting.contents and cli not in set clients;
 	
 	public getFarmer: Utils`string ==> Farmer
 		getFarmer(fname) == (

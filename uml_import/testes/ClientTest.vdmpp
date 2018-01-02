@@ -46,7 +46,7 @@ operations
   		assertEqual(<Big>, cli.basketRequest);
   		assertEqual(0, col.smallBaskets);
   		assertEqual(0, col.bigBaskets);
-  		assertTrue(col.canAddAssociate(col.smallBaskets +1,col.bigBaskets,7));
+  		assertTrue(col.canAddAssociate(col.smallBaskets +1,col.bigBaskets));
   		
 	  	assertTrue(cli.applyCollective(col));
 	  	assertTrue(not cli.undefinedCollective);	  	

@@ -19,7 +19,7 @@ operations
     	assertEqual({},cl.clients);
     	assertEqual({},cl.farmers);
     	assertEqual([], cl.waiting.contents);
-    	assertEqual({},cl.baskets);
+    	assertEqual([],cl.baskets);
     	assertEqual(0,cl.smallBaskets);
     	assertEqual(0,cl.bigBaskets);
   	);
@@ -60,10 +60,10 @@ operations
   public testCanAddClient: () ==> ()
   	testCanAddClient() == (
   		IO`println("Testing Can Add Client");
-  		assertTrue(cl.canAddAssociate(1,0,7));
-  		assertTrue(cl.canAddAssociate(0,1,8));
-  		assertTrue(cl.canAddAssociate(1,1,7));
-  		assertFalse(cl.canAddAssociate(3,3,7));
+  		assertTrue(cl.canAddAssociate(1,0));
+  		assertTrue(cl.canAddAssociate(0,1));
+  		assertTrue(cl.canAddAssociate(1,1));
+  		assertFalse(cl.canAddAssociate(3,3));
   	);
   
   public testAddClient: () ==> ()
@@ -72,7 +72,7 @@ operations
   		assertEqual(<Small>, cli1.basketRequest);
   		assertEqual(0, cl.smallBaskets);
   		assertEqual(0, cl.bigBaskets);
-  		assertTrue(cl.canAddAssociate(cl.smallBaskets +1,cl.bigBaskets,7));
+  		assertTrue(cl.canAddAssociate(cl.smallBaskets +1,cl.bigBaskets));
   		
   		assertTrue(cl.addAssociate(cli1));
   		assertEqual({cli1}, cl.clients);
@@ -83,7 +83,7 @@ operations
   		assertEqual(0, cl.bigBaskets);
   		
   		assertEqual(<Big>, cli2.basketRequest);
-  		assertTrue(cl.canAddAssociate(cl.smallBaskets,cl.bigBaskets +1,8));
+  		assertTrue(cl.canAddAssociate(cl.smallBaskets,cl.bigBaskets +1));
   		assertTrue(cl.addAssociate(cli2));
   		assertEqual({cli1,cli2}, cl.clients);
   		assertTrue(cli2 in set cl.clients);
@@ -92,7 +92,7 @@ operations
   		assertTrue(cl.smallBaskets + cl.bigBaskets = card cl.clients);
   		
   		assertEqual(<Small>, cli3.basketRequest);
-  		assertFalse(cl.canAddAssociate(cl.smallBaskets +1,cl.bigBaskets,7));
+  		assertFalse(cl.canAddAssociate(cl.smallBaskets +1,cl.bigBaskets));
   		assertFalse(cl.addAssociate(cli3));
   		assertEqual({cli1,cli2}, cl.clients);
   		assertTrue(cli3 not in set cl.clients);
@@ -126,13 +126,26 @@ operations
   		IO`println(basket1.getTotalWeight(basket1.content));
   	);
   
+  public testCreateBaskets: () ==> ()
+  	testCreateBaskets() == (
+  		IO`println("Testing Create Baskets");
+  		assertTrue(cl.smallBaskets + cl.bigBaskets > 0);
+  		assertEqual(1, cl.bigBaskets);
+  		assertEqual(1, cl.smallBaskets);
+  		cl.createBaskets();
+  		assertTrue(cl.baskets <> []);
+  		assertTrue(card elems cl.baskets = cl.smallBaskets + cl.bigBaskets);
+  		assertTrue(cl.baskets(1).size = <Small>);
+  		assertTrue(cl.baskets(2).size = <Big>);
+  	);
+  
   public testAddFromWaiting: () ==> ()
   	testAddFromWaiting() == (
   		IO`println("Testing move from waiting list to client");
   		assertEqual(<Small>, cl.waiting.top().basketRequest);
   		assertEqual(cli3, cl.waiting.top());
   		assertTrue(cli3 not in set cl.clients);
-  		assertTrue(cl.canAddAssociate(cl.smallBaskets +1,cl.bigBaskets,7));
+  		assertTrue(cl.canAddAssociate(cl.smallBaskets +1,cl.bigBaskets));
   		
   		assertTrue(cl.addFromWaitingList());
   		assertTrue(cli3 not in set elems cl.waiting.contents);
@@ -227,7 +240,7 @@ operations
   		testAddClient();
   		testGetClient();
   		testGenerateBasket();
-  		
+  		testCreateBaskets();
   		testRemoveClient();
   		testAddFromWaiting();
   		testEmptyClients();
