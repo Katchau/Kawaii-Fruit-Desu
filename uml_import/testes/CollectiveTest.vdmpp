@@ -112,6 +112,20 @@ operations
   		assertTrue(cliTest in set cl.clients);
   	);
   
+  public testGenerateBasket: () ==> ()
+  	testGenerateBasket() == (
+  		dcl basket1: Basket;
+  		dcl map3: Utils`ProdGrams;
+  		IO`println("Testing Generate Basket");
+  		basket1 := cl.generateBasket(<Small>, cl.prodAvailability);
+  		map3 := cl.subtractMaps(cl.prodAvailability, basket1.content);
+  		basket1 := cl.generateBasket(<Small>, map3);
+  		map3 := cl.subtractMaps(map3, basket1.content);
+  		basket1 := cl.generateBasket(<Big>, map3);
+  		map3 := cl.subtractMaps(map3, basket1.content);
+  		IO`println(basket1.getTotalWeight(basket1.content));
+  	);
+  
   public testAddFromWaiting: () ==> ()
   	testAddFromWaiting() == (
   		IO`println("Testing move from waiting list to client");
@@ -212,6 +226,8 @@ operations
   		testCanAddClient();
   		testAddClient();
   		testGetClient();
+  		testGenerateBasket();
+  		
   		testRemoveClient();
   		testAddFromWaiting();
   		testEmptyClients();

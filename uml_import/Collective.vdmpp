@@ -19,8 +19,14 @@ instance variables
 functions
 
 	public isProdAvailable: nat * nat * real -> bool
-		isProdAvailable(small,big,avail) == small * minSmall + big * minBig <= avail; 
-
+		isProdAvailable(small,big,avail) == small * minSmall + big * minBig <= avail;
+		
+	public subtractMaps: Utils`ProdGrams * Utils`ProdGrams -> Utils`ProdGrams
+		subtractMaps(p1, p2) == if p1 = {|->} or dom p1 inter dom p2 = {} then {|->}
+			else let v in set (dom p1 inter dom p2) in ( p1 ++ {v |-> p1(v) - p2(v)}) ++ subtractMaps({v} <-: p1, {v} <-: p2)
+		pre forall v in set dom p1 &
+			if v in set dom p2 then p1(v) >= p2(v) else true;
+		
 operations
 
 	public Collective: Utils`string ==> Collective
@@ -40,6 +46,51 @@ operations
 		)
 		pre exists1 cli in set clients & cli.name = cname
 		post RESULT.name = cname and RESULT in set clients;
+	
+	public generateBasket: Utils`BasketType * Utils`ProdGrams ==> Basket
+		generateBasket(basketType, curProds) == (
+			dcl n: nat1;
+			dcl minSize: real;
+			dcl ret: Basket := new Basket({|->}, basketType);
+			dcl stopCycle: bool;
+			if basketType = <Small>
+			then (
+				n := basketSmall;
+				minSize := minSmall
+			)
+			else (
+				n := basketBig;
+				minSize := minBig
+			);
+			for all prod in set dom curProds do(
+				if curProds(prod) >= minSize and prod not in set dom ret.content and card dom ret.content < n
+				then ret.add(prod, minSize)
+				else if curProds(prod) < minSize and prod not in set dom ret.content and card dom ret.content < n
+				then (
+					stopCycle := false;
+					for all p in set dom curProds do(
+						if (curProds(p) - minSize) < (minSize - curProds(prod)) or stopCycle
+						then skip
+						else if p in set dom ret.content and ( curProds(p) - ret.getQuantity(p) ) >= (minSize - curProds(prod)) 
+						then (
+							ret.updateProductQuantity(p, (minSize - curProds(prod)));
+							ret.add(prod, curProds(prod));
+							stopCycle := true;
+						)
+						else if p not in set dom ret.content 
+						then (
+							ret.add(p, (minSize - curProds(prod)));
+							ret.add(prod, curProds(prod));
+							stopCycle := true
+						);
+					)
+				);
+			);
+			return ret
+		)
+		pre curProds <> {|->} and if basketType = <Small>
+			then Basket`getTotalWeight(curProds) + 2 >= Utils`smallWeight
+			else Basket`getTotalWeight(curProds) + 2 >= Utils`bigWeight;
 	
 	public pure canAddAssociate : nat * nat * nat1 ==> bool
 		canAddAssociate(small, big, minNumber) == (
