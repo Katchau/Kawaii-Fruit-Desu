@@ -23,7 +23,16 @@ operations
   			IO`print(expected);
   			IO`println(")\n")
 		)
-	post expected = actual
-
+	post expected = actual;
+	
+	protected assertFalse : ? ==> ()
+		assertFalse(actual) ==
+			if actual = true then (
+				IO`print("Actual value (");
+  			IO`print(actual);
+  			IO`print(") isnt false!");
+  			IO`println("\n")
+			)
+		post actual = false;
 		
 end MyTestCase
