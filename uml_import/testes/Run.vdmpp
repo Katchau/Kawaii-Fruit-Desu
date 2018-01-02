@@ -5,8 +5,8 @@ operations
      new FarmerTest().testAll();
      new BasketTest().testAll();
      new ProductTest().testAll();
-     new CollectiveTest().testAll();
      new ClientTest().testAll();
+     new CollectiveTest().testAll();
      IO`println("Tests completed!");
 	);
 end Run

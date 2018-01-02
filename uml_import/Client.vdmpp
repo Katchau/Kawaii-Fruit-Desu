@@ -45,11 +45,15 @@ operations
        -- ; 
 
   public  getBasket : ()  ==> () 
-  getBasket() ==  
-    basketReceived := collective.collectBasket(self)
+  getBasket() ==  (
+  	dcl possibleBasket: Basket := collective.collectBasket(self);
+    if not undefinedBasket
+    then basketReceived := possibleBasket
+    )
   pre hasCollected = false and hasCancelled = false and collective <> undefined 
       -- and basketRequest <> undefined -- and basketReceived = undefined 
-  post hasCollected = true and hasCancelled = hasCancelled~ --and collective = collective~ 
+  post if hasCollected = true then (not undefinedBasket and hasCollected )
+  				else (undefinedBasket and not hasCollected) --and hasCancelled = hasCancelled~ --and collective = collective~ 
       --and basketRequest = basketRequest~ and basketReceived <> undefined; 
 ; 
 

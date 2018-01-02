@@ -234,14 +234,9 @@ operations
   	public testNewWeekAndYear: () ==> ()
   	testNewWeekAndYear() == (  	
   		IO`println("Testing New Week and Year");
-  		for all cli in set cl.clients do (
-  			--assertTrue(cli.hasCancelled);
-  			assertTrue(cli.hasCollected);
-  			assertTrue(cli.undefinedBasket);
-  		);
   		cl.newWeek();
   		for all cli in set cl.clients do (
-  			assertTrue(not cli.hasCancelled);
+  			assertEqual(false,cli.hasCancelled);
   			assertTrue(not cli.hasCollected);
   			assertTrue(cli.undefinedBasket);
   		);

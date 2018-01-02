@@ -36,6 +36,8 @@ operations
 	  		p7 |-> 10000,
 	  		p8 |-> 10000
 	  		}));  	
+	  		
+	  		
   	);
   
   public testApplyCollective: () ==> ()
@@ -49,6 +51,8 @@ operations
   		assertTrue(col.canAddAssociate(col.smallBaskets +1,col.bigBaskets));
   		
 	  	assertTrue(cli.applyCollective(col));
+	  	
+	  		col.createBaskets();
 	  	assertTrue(not cli.undefinedCollective);	  	
   		IO`println("-- Passed apply to collective");
   	);
@@ -64,7 +68,9 @@ operations
   	testGetBasket() == (
 	  	assertTrue(cli.applyCollective(col));
   		cli.getBasket();
-  		assertTrue(cli.hasCollected);
+  		if(cli.undefinedBasket) then assertEqual(false, cli.hasCollected)
+  		else assertTrue(cli.hasCollected);
+  		
   		IO`println("-- Passed get basket");
   	);
   	

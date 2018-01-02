@@ -92,6 +92,7 @@ operations
 		createBaskets() == (
 		dcl curProds: Utils`ProdGrams := prodAvailability;
 		dcl basket: Basket;
+		baskets := [];
 			for all cli in set clients do (
 				basket := generateBasket(cli.basketRequest, curProds);
 				baskets := baskets ^ [basket];
@@ -273,22 +274,42 @@ operations
     is not yet specified;
 
 	public collectBasket : Client ==>  Basket  
-  collectBasket(cl) == ( 
-    if cl.hasCancelled then (cl.setUndefinedBasket(true); return undefined); 
-    if cl.hasCollected then (cl.setUndefinedBasket(true); return undefined);
-    -- onde registamos os baskets ja levantados?
-    --if cl.basketRequest = <Small> then smallBaskets := smallBaskets - 1; 
-    --if cl.basketRequest = <Big> then bigBaskets := bigBaskets - 1;  
-    cl.setHasCollected(true); 
-    cl.setUndefinedBasket(false);
-    return generateBasket(cl.basketRequest,prodAvailability); 
+  collectBasket(cl) == (
+  
+    dcl basketSet: set of Basket := elems baskets;  
+		dcl p1: Product := new Product("apple");
+		dcl p2: Product := new Product("banana");
+		
+    if cl.hasCancelled then (cl.setUndefinedBasket(true); return (new Basket({p1|->100, p2|->300}, <Big>)););
+    if cl.hasCollected then (cl.setUndefinedBasket(true); return (new Basket({p1|->100, p2|->300}, <Big>)););
+    
+    if cl.basketRequest = <Big> then 
+    	for all b in set basketSet do (
+    				if b.size = <Big>
+    				then (basketSet := basketSet \ {b};    							
+    							cl.setHasCollected(true); 
+    							cl.setUndefinedBasket(false);
+    							return b; 
+    						)
+    	)
+    else (
+    	for all b in set basketSet do (
+    				if b.size = <Small>
+    				then (basketSet := basketSet \ {b};    							
+    							cl.setHasCollected(true); 
+    							cl.setUndefinedBasket(false);
+    							return b; 
+    				)
+    );
+    );
+    
+    cl.setUndefinedBasket(true); 
+    return (new Basket({p1|->100, p2|->300}, <Big>))
   ) 
   pre cl in set clients 
-  post if cl.hasCancelled
-   				then cl.hasCollected = false 
-  				else cl.hasCollected = true ;
-  						--and if cl.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1 
-  						--else bigBaskets = bigBaskets~ - 1); 
+  post if cl.hasCollected
+   				then cl.undefinedBasket = false 
+  				else cl.undefinedBasket = true ;
   						
   public newYear: () ==> ()
   	newYear() == 
