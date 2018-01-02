@@ -41,7 +41,7 @@ operations
 		pre exists1 cli in set clients & cli.name = cname
 		post RESULT.name = cname and RESULT in set clients;
 	
-	public canAddAssociate : nat * nat * nat1 ==> bool
+	public pure canAddAssociate : nat * nat * nat1 ==> bool
 		canAddAssociate(small, big, minNumber) == (
 			dcl sum: nat := 0;
 			for all prod in set dom prodAvailability do (
@@ -55,14 +55,18 @@ operations
   	addAssociate(cli) == (
   		if cli.basketRequest = <Small> and canAddAssociate(smallBaskets +1, bigBaskets, basketSmall)
   		then (
-  			smallBaskets := smallBaskets + 1;
-  			clients := clients union {cli};
+  			atomic(
+  				clients := clients union {cli};
+  				smallBaskets := smallBaskets + 1
+  			);
   			return true
   		);
   		if cli.basketRequest = <Big> and canAddAssociate(smallBaskets, bigBaskets + 1, basketBig)
   		then (
-  			bigBaskets := bigBaskets + 1;
-  			clients := clients union {cli};
+  			atomic(
+  				clients := clients union {cli};
+  				bigBaskets := bigBaskets + 1;
+  			);
   			return true
   		);
   		waiting.push(cli);
@@ -75,16 +79,21 @@ operations
 
   public removeAssociate : Client ==> ()
   	removeAssociate(cli) == (
-  		clients := clients \ {cli};
   		if cli.basketRequest = <Small>
-  		then smallBaskets := smallBaskets - 1
-  		else bigBaskets := bigBaskets -1;
+  		then atomic(
+  				clients := clients \ {cli};
+  				smallBaskets := smallBaskets - 1
+  			)
+  		else atomic(
+  			clients := clients \ {cli};
+  			bigBaskets := bigBaskets -1
+  		);
   	)
     pre cli in set clients and cli not in set elems waiting.contents
     post cli not in set clients and
     	if cli in set clients~ and cli.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1
     	else if cli in set clients~ and cli.basketRequest = <Big> then bigBaskets = bigBaskets~ - 1
-    	else smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~;
+    	else true;
 	
 	public addFromWaitingList: () ==> bool
 		addFromWaitingList() == (
@@ -102,19 +111,33 @@ operations
 			)
 			else return false;
 		)
-		pre clients <> {} and waiting.contents <> []
+		pre waiting.contents <> []
 		post if RESULT 
 			then (waiting.contents = tl waiting~.contents and hd waiting~.contents in set clients )
 			else ( waiting.contents = waiting~.contents and clients~ = clients );
 	
 	-- remover clientes em excesso
-	--public removeExtraClients: () ==> ()
-		--removeExtraClients() == (
-			--for all cli in set clients do (
-				--if not hasFreeSpace(clients.basketRequest)
-				--then 
-			--)
-		--);
+	public kickClients: () ==> ()
+		kickClients() == (
+			dcl size: nat1 := 1;
+			for all cli in set clients do (
+				if cli.basketRequest = <Small>
+				then size := basketSmall
+				else size := basketBig;
+				if not canAddAssociate(smallBaskets, bigBaskets, size)
+				then (
+					removeAssociate(cli);
+					waiting.push(cli)
+				)
+			)
+		)
+		pre card clients > 0
+		post forall cli in set clients &
+			if cli in set elems waiting.contents and cli in set clients~
+			then if cli.basketRequest = <Small>
+				then not canAddAssociate(smallBaskets + 1, bigBaskets, basketSmall)
+				else not canAddAssociate(smallBaskets, bigBaskets +1, basketBig)
+			else true;
 	
 	public getFarmer: Utils`string ==> Farmer
 		getFarmer(fname) == (

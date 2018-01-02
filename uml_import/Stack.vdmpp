@@ -1,20 +1,20 @@
 class Stack
 instance variables
-	public contents : seq of Client := [];
+	public contents : seq of ? := [];
 operations
  	public Stack: () ==> Stack
  		Stack() == return self
  		post contents = [];
  	public clear: () ==> ()
  		clear() == contents := [];
- 	public push: Client ==> ()
+ 	public push: ? ==> ()
  		push(x) == contents := [x] ^ contents
  		post contents = [x] ^ contents~;
  	public pop: () ==> ()
  		pop() == contents := tl contents
  		pre contents <> []
  		post contents = tl contents~;
- 	public top: () ==> Client
+ 	public top: () ==> ?
  		top() == return hd contents
  		pre contents <> []
  		post RESULT = hd contents;

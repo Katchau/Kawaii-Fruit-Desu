@@ -4,6 +4,9 @@ instance variables
 	map2: Utils`ProdGrams := {new Product("banana") |-> 1000, new Product("apple") |-> 1000, new Product("orange") |-> 1000, new Product("tomato") |-> 1000, new Product("pinneapple") |-> 1000, new Product("onion") |-> 1000, new Product("troncha") |-> 1000};
 	farmer1: Farmer := new Farmer("FarmBoy", map1);
 	farmer2: Farmer := new Farmer("FarmGirl", map1);
+	cli1: Client := new Client("Alexis", <Small>);
+	cli3: Client := new Client("Mex", <Small>);
+	cli2: Client := new Client("Eder", <Big>);
 	clName: Utils`string := "Gaia";
 	cl: Collective := new Collective(clName);
 operations
@@ -43,6 +46,120 @@ operations
   		);
   	);
   
+  public testGetFarmer: () ==> ()
+  	testGetFarmer() == (
+  		dcl farmerTest: Farmer;
+  		IO`println("Testing Get Farmer");
+  		assertTrue(exists1 farmer in set cl.farmers & farmer.name = "FarmBoy");
+  		farmerTest := cl.getFarmer("FarmBoy");
+  		assertEqual(farmer1, farmerTest);
+  		assertEqual("FarmBoy", farmerTest.name);
+  		assertTrue(farmer1 in set cl.farmers);
+  	);
+  
+  public testCanAddClient: () ==> ()
+  	testCanAddClient() == (
+  		IO`println("Testing Can Add Client");
+  		assertTrue(cl.canAddAssociate(1,0,7));
+  		assertTrue(cl.canAddAssociate(0,1,8));
+  		assertTrue(cl.canAddAssociate(1,1,7));
+  		assertFalse(cl.canAddAssociate(3,3,7));
+  	);
+  
+  public testAddClient: () ==> ()
+  	testAddClient() == (
+  		IO`println("Testing Add Client");
+  		assertEqual(<Small>, cli1.basketRequest);
+  		assertEqual(0, cl.smallBaskets);
+  		assertEqual(0, cl.bigBaskets);
+  		assertTrue(cl.canAddAssociate(cl.smallBaskets +1,cl.bigBaskets,7));
+  		
+  		assertTrue(cl.addAssociate(cli1));
+  		assertEqual({cli1}, cl.clients);
+  		assertTrue(cli1 in set cl.clients);
+  		assertTrue(cli1 not in set elems cl.waiting.contents);
+  		assertEqual(1, cl.smallBaskets);
+  		assertTrue(cl.smallBaskets = 0 + 1);
+  		assertEqual(0, cl.bigBaskets);
+  		
+  		assertEqual(<Big>, cli2.basketRequest);
+  		assertTrue(cl.canAddAssociate(cl.smallBaskets,cl.bigBaskets +1,8));
+  		assertTrue(cl.addAssociate(cli2));
+  		assertEqual({cli1,cli2}, cl.clients);
+  		assertTrue(cli2 in set cl.clients);
+  		assertEqual(1, cl.bigBaskets);
+  		assertEqual(1, cl.smallBaskets);
+  		assertTrue(cl.smallBaskets + cl.bigBaskets = card cl.clients);
+  		
+  		assertEqual(<Small>, cli3.basketRequest);
+  		assertFalse(cl.canAddAssociate(cl.smallBaskets +1,cl.bigBaskets,7));
+  		assertFalse(cl.addAssociate(cli3));
+  		assertEqual({cli1,cli2}, cl.clients);
+  		assertTrue(cli3 not in set cl.clients);
+  		assertTrue(cli3 in set elems cl.waiting.contents);
+  		assertEqual(1, cl.bigBaskets);
+  		assertEqual(1, cl.smallBaskets);
+  	);
+  
+  public testGetClient: () ==> ()
+  	testGetClient() == (
+  		dcl cliTest: Client;
+  		IO`println("Testing Get Client");
+  		assertTrue(exists1 cli in set cl.clients & cli.name = "Eder");
+  		cliTest := cl.getClient("Eder");
+  		assertEqual(cli2, cliTest);
+  		assertEqual("Eder", cliTest.name);
+  		assertTrue(cliTest in set cl.clients);
+  	);
+  
+  public testAddFromWaiting: () ==> ()
+  	testAddFromWaiting() == (
+  		IO`println("Testing move from waiting list to client");
+  		assertEqual(<Small>, cl.waiting.top().basketRequest);
+  		assertEqual(cli3, cl.waiting.top());
+  		assertTrue(cli3 not in set cl.clients);
+  		assertTrue(cl.canAddAssociate(cl.smallBaskets +1,cl.bigBaskets,7));
+  		
+  		assertTrue(cl.addFromWaitingList());
+  		assertTrue(cli3 not in set elems cl.waiting.contents);
+  		assertEqual([], cl.waiting.contents);
+  		assertTrue(cli3 in set cl.clients);
+  	);
+  
+  public testRemoveClient: () ==> ()
+  	testRemoveClient() == (
+  		IO`println("Testing Remove Client");
+  		assertTrue(cli2 in set cl.clients);
+  		assertEqual({cli1,cli2}, cl.clients);
+  		assertEqual(1, cl.bigBaskets);
+  		assertEqual(1, cl.smallBaskets);
+  		assertTrue(cli2.basketRequest = <Big>);
+  		cl.removeAssociate(cli2);
+  		assertTrue(cli2 not in set cl.clients);
+  		assertEqual(0, cl.bigBaskets);
+  		assertEqual(1, cl.smallBaskets);
+  		assertEqual({cli1}, cl.clients);
+  	);
+  
+  public testEmptyClients: () ==> ()
+  	testEmptyClients() == (
+  		IO`println("Testing Empty Clients");
+  		assertTrue(cli3 in set cl.clients);
+  		assertEqual(0, cl.bigBaskets);
+  		assertEqual(2, cl.smallBaskets);
+  		assertTrue(cli3.basketRequest = <Small>);
+  		cl.removeAssociate(cli3);
+  		assertTrue(cli3 not in set cl.clients);
+  		assertEqual(0, cl.bigBaskets);
+  		assertEqual(1, cl.smallBaskets);
+  		assertEqual({cli1}, cl.clients);
+  		cl.removeAssociate(cli1);
+  		assertTrue(cli1 not in set cl.clients);
+  		assertEqual(0, cl.bigBaskets);
+  		assertEqual(0, cl.smallBaskets);
+  		assertEqual({}, cl.clients);
+  	);
+  	
   public testRemoveFarmer: () ==> ()
   	testRemoveFarmer() == (
   		IO`println("Testing Removing Farmer");
@@ -64,10 +181,42 @@ operations
   		assertTrue(forall prod in set dom farmer1.production & prod not in set dom cl.prodAvailability); 
   	);
   
+  public testKickClients: () ==> ()
+  	testKickClients() == (
+  		IO`println("Testing Kick Clients");
+  		assertTrue(cli2 in set cl.clients);
+  		assertTrue(cli1 in set cl.clients);
+  		assertTrue(cli1 not in set elems cl.waiting.contents);
+  		assertTrue(cli2 not in set elems cl.waiting.contents);
+  		assertTrue(cli3 in set elems cl.waiting.contents);
+  		assertEqual(1, cl.bigBaskets);
+  		assertEqual(1, cl.smallBaskets);
+  		
+  		cl.kickClients();
+  		assertTrue(cli3 not in set cl.clients);
+  		assertTrue(cli2 not in set cl.clients);
+  		assertTrue(cli1 not in set cl.clients);
+  		assertTrue(cli1 in set elems cl.waiting.contents);
+  		assertTrue(cli2 in set elems cl.waiting.contents);
+  		assertTrue(cli3 in set elems cl.waiting.contents);
+  		assertEqual(0, cl.bigBaskets);
+  		assertEqual(0, cl.smallBaskets);
+  		assertEqual({}, cl.clients);
+  	);
+  
   public testAll: () ==> ()
   	testAll() == (
   		testConstructor();
   		testAddFarmer();
+  		testGetFarmer();
+  		testCanAddClient();
+  		testAddClient();
+  		testGetClient();
+  		testRemoveClient();
+  		testAddFromWaiting();
+  		testEmptyClients();
+  		testAddClient();
   		testRemoveFarmer();
+  		testKickClients();
   	);
 end CollectiveTest
