@@ -76,5 +76,11 @@ operations
   public setUndefinedBasket: bool ==> () 
   setUndefinedBasket(ub) == undefinedBasket:= ub 
   post undefinedBasket = ub; 
+  
+  public newWeek: () ==> ()
+  newWeek() == (hasCollected := false; hasCancelled := false; undefinedBasket := true);
+  
+  public newYear: () ==> ()
+  newYear() == (hasCollected := false; hasCancelled := false; undefinedBasket := true; hasPaidAnual := false);
 
 end Client

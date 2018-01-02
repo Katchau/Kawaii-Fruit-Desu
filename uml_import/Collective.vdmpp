@@ -289,6 +289,23 @@ operations
   				else cl.hasCollected = true ;
   						--and if cl.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1 
   						--else bigBaskets = bigBaskets~ - 1); 
+  						
+  public newYear: () ==> ()
+  	newYear() == 
+  		for all cli in set clients do cli.newYear()
+  post forall cli in set clients &
+  				cli.hasPaidAnual = false and 
+  				cli.hasCancelled = false and
+  				cli.hasCollected = false and
+  				cli.undefinedBasket = true;
+  				
+   public newWeek: () ==> ()
+  	newWeek() == 
+  		for all cli in set clients do cli.newWeek()
+  post forall cli in set clients &
+  				cli.hasCancelled = false and
+  				cli.hasCollected = false and
+  				cli.undefinedBasket = true;
  
    
 end Collective

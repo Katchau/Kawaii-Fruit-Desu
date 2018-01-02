@@ -75,6 +75,20 @@ operations
   		IO`println("-- Passed cancel basket")
   	);
   
+  
+ 	public testNewWeekAndYear: () ==> ()
+  	testNewWeekAndYear() == (
+  		cli.newWeek();
+  		assertTrue(not cli.hasCancelled);
+  		assertTrue(not cli.hasCollected);
+  		assertTrue(cli.undefinedBasket);
+   
+			cli.newYear();
+  		assertTrue(not cli.hasCancelled);
+  		assertTrue(not cli.hasCollected);
+  		assertTrue(cli.undefinedBasket);
+  		assertTrue(not cli.hasPaidAnual);
+  	);
 
 	public testAll: () ==> ()
   	testAll() == (
@@ -84,6 +98,7 @@ operations
 			testQuitCollective();
 			testGetBasket();
 			testCancelBasket();
+			testNewWeekAndYear();
   		IO`println("Client class passed all tests!");
   	);
 
