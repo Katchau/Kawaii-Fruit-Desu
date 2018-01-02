@@ -104,13 +104,13 @@ operations
 	
   public addAssociate : Client ==> bool
   	addAssociate(cli) == (
-  	IO`println(cli.basketRequest);
   		if cli.basketRequest = <Small> and canAddAssociate(smallBaskets +1, bigBaskets, basketSmall)
   		then (
   			atomic(
   				clients := clients union {cli};
   				smallBaskets := smallBaskets + 1
   			);
+  			cli.setUndefinedCollective(false);
   			return true
   		);
   		if cli.basketRequest = <Big> and canAddAssociate(smallBaskets, bigBaskets + 1, basketBig)
@@ -119,6 +119,7 @@ operations
   				clients := clients union {cli};
   				bigBaskets := bigBaskets + 1;
   			);
+  			cli.setUndefinedCollective(false);
   			return true
   		);
   		waiting.push(cli);
@@ -136,12 +137,13 @@ operations
   		if cli.basketRequest = <Small>
   		then atomic(
   				clients := clients \ {cli};
-  				smallBaskets := smallBaskets - 1
+  				smallBaskets := smallBaskets - 1;
   			)
   		else atomic(
   			clients := clients \ {cli};
   			bigBaskets := bigBaskets -1
   		);
+  		cli.setUndefinedCollective(true);
   	)
     pre cli in set clients and cli not in set elems waiting.contents
     post cli not in set clients and
@@ -237,23 +239,23 @@ operations
   updateRequests() ==
     is not yet specified;
 
-	public collectBasket : Client ==> Basket 
+	public collectBasket : Client ==>  Basket  
   collectBasket(cl) == ( 
-    if cl.hasCancelled then return undefined; 
-    if cl.hasCollected then return undefined; 
-    if cl.basketRequest = <Small> then smallBaskets := smallBaskets - 1; 
-    if cl.basketRequest = <Big> then bigBaskets := bigBaskets - 1;  
+    if cl.hasCancelled then (cl.setUndefinedBasket(true); return undefined); 
+    if cl.hasCollected then (cl.setUndefinedBasket(true); return undefined);
+    -- onde registamos os baskets ja levantados?
+    --if cl.basketRequest = <Small> then smallBaskets := smallBaskets - 1; 
+    --if cl.basketRequest = <Big> then bigBaskets := bigBaskets - 1;  
     cl.setHasCollected(true); 
-    return generateBasket(cl.basketRequest) 
+    cl.setUndefinedBasket(false);
+    return generateBasket(cl.basketRequest,prodAvailability); 
   ) 
   pre cl in set clients 
-  post if cl.hasCancelled then (RESULT = undefined) else (1=1) and 
-    if cl.hasCollected then (RESULT = undefined) else (1=1) and 
-    if cl.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1 else bigBaskets = bigBaskets~ - 1 and 
-    cl.hasCollected = true; 
+  post if cl.hasCancelled
+   				then cl.hasCollected = false 
+  				else cl.hasCollected = true ;
+  						--and if cl.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1 
+  						--else bigBaskets = bigBaskets~ - 1); 
  
- 
-  public generateBasket : Utils`BasketType ==> Basket 
-  generateBasket(s) == is not yet specified; 
    
 end Collective

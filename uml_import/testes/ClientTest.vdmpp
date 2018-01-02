@@ -49,26 +49,30 @@ operations
   		assertTrue(col.canAddAssociate(col.smallBaskets +1,col.bigBaskets,7));
   		
 	  	assertTrue(cli.applyCollective(col));
+	  	assertTrue(not cli.undefinedCollective);	  	
   		IO`println("-- Passed apply to collective");
+  	);
+  	
+  public testQuitCollective: () ==> ()
+  	testQuitCollective() == (
+	  	assertTrue(cli.quitCollective());
+	  	assertTrue(cli.undefinedCollective);	  	
+  		IO`println("-- Passed quit collective");
   	);
   	
   public testGetBasket: () ==> ()
   	testGetBasket() == (
-  		--makeFakeCollective();
-  		
-  		--assertEqual(<Big>, cli.basketRequest);
-  		--assertEqual(0, col.smallBaskets);
-  		--assertEqual(0, col.bigBaskets);
-  		--assertTrue(col.canAddAssociate(col.smallBaskets +1,col.bigBaskets,7));
 	  	assertTrue(cli.applyCollective(col));
-	  	
-	  	
-  		IO`println("what collective?");
-  		IO`println(cli.collective);
-	  	
   		cli.getBasket();
   		assertTrue(cli.hasCollected);
   		IO`println("-- Passed get basket");
+  	);
+  	
+  public testCancelBasket:() ==> ()
+  	testCancelBasket() == (
+  		cli.cancelBasket();
+  		assertTrue(cli.hasCancelled);
+  		IO`println("-- Passed cancel basket")
   	);
   
 
@@ -77,7 +81,9 @@ operations
   		IO`println("Testing client class functions");
   		testConstructor();
 			testApplyCollective();
-			--testGetBasket();
+			testQuitCollective();
+			testGetBasket();
+			testCancelBasket();
   		IO`println("Client class passed all tests!");
   	);
 

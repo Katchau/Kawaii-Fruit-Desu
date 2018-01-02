@@ -4,7 +4,9 @@ instance variables
   public hasPaidAnual: bool; 
   public hasCollected: bool; 
   public hasCancelled: bool; 
+  public undefinedCollective: bool; 
   public collective: Collective; 
+  public undefinedBasket: bool;
   public basketReceived: Basket; 
   public basketRequest: Utils`BasketType; 
 
@@ -16,6 +18,8 @@ operations
       hasPaidAnual := false; 
       hasCollected := false; 
       hasCancelled := false; 
+      undefinedCollective := true;
+      undefinedBasket := true;
       --collective := undefined; 
       --basketReceived := undefined; 
     ) 
@@ -23,44 +27,54 @@ operations
 		post name = n and basketRequest = type;
 
    public applyCollective : Collective ==> bool 
- 	 applyCollective(c) == 
-			return c.addAssociate(self)
---    	IO`println(name); 
---    IO`println(basketRequest);    
---    IO`println(hasCollected);    
---           
---    IO`println(hasPaidAnual); 
---    IO`println(hasCancelled); 
-     
-   pre basketRequest = <Small> or basketRequest = <Big> 
-  --post --if RESULT = true 
-          --then collective = c 
-          --else RESULT <> true 
+ 	 applyCollective(c) == (
+			undefinedCollective := not c.addAssociate(self);
+			collective := c;
+			return not (undefinedCollective)
+   )
+   post undefinedCollective = false;
+  -- pre basketRequest = <Small> or basketRequest = <Big>
+   --post true; 
+  -- post if RESULT = true 
+    --      then collective = c 
+      --    and undefinedCollective = false
+        --  else undefinedCollective = true
           --else collective = undefined 
      --    and name = name~ and basketRequest = basketRequest~ and hasPaidAnual = hasPaidAnual~  
       --  and hasCollected = hasCollected~ and hasCancelled = hasCancelled~ 
-        ; 
+       -- ; 
 
   public  getBasket : ()  ==> () 
   getBasket() ==  
-    basketReceived := collective.collectBasket(self) 
+    basketReceived := collective.collectBasket(self)
   pre hasCollected = false and hasCancelled = false and collective <> undefined 
       -- and basketRequest <> undefined -- and basketReceived = undefined 
   post hasCollected = true and hasCancelled = hasCancelled~ --and collective = collective~ 
       --and basketRequest = basketRequest~ and basketReceived <> undefined; 
 ; 
 
-	public setHasCollected: bool ==> () 
-  setHasCollected(hc) == hasCollected := hc 
-  post hasCollected = hc; 
+	 public  quitCollective : ()  ==> bool
+  quitCollective() == (
+  	collective.removeAssociate(self);
+  	return undefinedCollective;
+  )
+  pre undefinedCollective = false
+  post undefinedCollective = true;
 
-  public  cancelBasket : ()  ==> () 
+  public cancelBasket : ()  ==> () 
   cancelBasket() == hasCancelled := true 
   post hasCancelled = true; 
 
-  public  quitCollective : ()  ==> ()
-  quitCollective() == return collective.removeAssociate(self)
-  pre collective <> undefined; -- criar variavel para isto
-
+	public setHasCollected: bool ==> () 
+  setHasCollected(hc) == hasCollected := hc 
+  post hasCollected = hc; 
+  
+	public setUndefinedCollective: bool ==> () 
+  setUndefinedCollective(uc) == undefinedCollective := uc 
+  post undefinedCollective = uc; 
+  
+  public setUndefinedBasket: bool ==> () 
+  setUndefinedBasket(ub) == undefinedBasket:= ub 
+  post undefinedBasket = ub; 
 
 end Client
