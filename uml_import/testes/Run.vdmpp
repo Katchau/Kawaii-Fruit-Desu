@@ -6,6 +6,7 @@ operations
      new BasketTest().testAll();
      new ProductTest().testAll();
      new CollectiveTest().testAll();
+     new ClientTest().testAll();
      IO`println("Tests completed!");
 	);
 end Run

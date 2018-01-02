@@ -1,0 +1,84 @@
+class ClientTest is subclass of MyTestCase
+instance variables
+	cli: Client := new Client("Annelise Duchamp", <Big>);
+	col: Collective := new Collective("Almada");
+operations
+  public testConstructor: () ==> ()
+  	testConstructor() == (
+    	assertEqual("Annelise Duchamp", cli.name);
+    	assertEqual(<Big>, cli.basketRequest);
+    	assertEqual(false, cli.hasPaidAnual);
+    	assertEqual(false, cli.hasCollected);
+    	assertEqual(false, cli.hasCancelled);
+    	    	
+    	IO`println("-- Passed constructor");
+  	);
+  	
+  public makeFakeCollective: () ==> ()
+  	makeFakeCollective() == (
+  		-- adicionar farmers e quantidades suficientes para fornecer 1 cesto big
+			dcl p1: Product := new Product("apple");
+			dcl p2: Product := new Product("banana");
+			dcl p3: Product := new Product("lettuce");
+			dcl p4: Product := new Product("grapefruit");
+			dcl p5: Product := new Product("kale");
+			dcl p6: Product := new Product("pumpkin");
+			dcl p7: Product := new Product("pear");
+			dcl p8: Product := new Product("papaya");
+	  
+	  	col.addFarmer(new Farmer("Campónio", 
+	  		{p1 |-> 10000,
+	  		p2 |-> 10000,
+	  		p3 |-> 10000,
+	  		p4 |-> 10000,
+	  		p5 |-> 10000,
+	  		p6 |-> 10000,
+	  		p7 |-> 10000,
+	  		p8 |-> 10000
+	  		}));  	
+  	);
+  
+  public testApplyCollective: () ==> ()
+  	testApplyCollective() == (	  	
+	  	
+	  	makeFakeCollective();
+	  	
+  		assertEqual(<Big>, cli.basketRequest);
+  		assertEqual(0, col.smallBaskets);
+  		assertEqual(0, col.bigBaskets);
+  		assertTrue(col.canAddAssociate(col.smallBaskets +1,col.bigBaskets,7));
+  		
+	  	assertTrue(cli.applyCollective(col));
+  		IO`println("-- Passed apply to collective");
+  	);
+  	
+  public testGetBasket: () ==> ()
+  	testGetBasket() == (
+  		--makeFakeCollective();
+  		
+  		--assertEqual(<Big>, cli.basketRequest);
+  		--assertEqual(0, col.smallBaskets);
+  		--assertEqual(0, col.bigBaskets);
+  		--assertTrue(col.canAddAssociate(col.smallBaskets +1,col.bigBaskets,7));
+	  	assertTrue(cli.applyCollective(col));
+	  	
+	  	
+  		IO`println("what collective?");
+  		IO`println(cli.collective);
+	  	
+  		cli.getBasket();
+  		assertTrue(cli.hasCollected);
+  		IO`println("-- Passed get basket");
+  	);
+  
+
+	public testAll: () ==> ()
+  	testAll() == (
+  		IO`println("Testing client class functions");
+  		testConstructor();
+			testApplyCollective();
+			--testGetBasket();
+  		IO`println("Client class passed all tests!");
+  	);
+
+end ClientTest

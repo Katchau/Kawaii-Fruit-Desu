@@ -53,6 +53,7 @@ operations
 	
   public addAssociate : Client ==> bool
   	addAssociate(cli) == (
+  	IO`println(cli.basketRequest);
   		if cli.basketRequest = <Small> and canAddAssociate(smallBaskets +1, bigBaskets, basketSmall)
   		then (
   			atomic(
@@ -70,9 +71,11 @@ operations
   			return true
   		);
   		waiting.push(cli);
+  		IO`println("pushed");
   		return false
   	)
-  	pre cli not in set clients and cli not in set elems waiting.contents
+  	pre cli not in set clients 
+  	and cli not in set elems waiting.contents
   	post (if RESULT then cli in set clients else cli in set elems waiting.contents) and
   		if cli in set clients then (smallBaskets = smallBaskets~ + 1 or bigBaskets = bigBaskets~ + 1)
   		else (smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~ and cli in set elems waiting.contents);
@@ -183,5 +186,23 @@ operations
   updateRequests() ==
     is not yet specified;
 
-
+	public collectBasket : Client ==> Basket 
+  collectBasket(cl) == ( 
+    if cl.hasCancelled then return undefined; 
+    if cl.hasCollected then return undefined; 
+    if cl.basketRequest = <Small> then smallBaskets := smallBaskets - 1; 
+    if cl.basketRequest = <Big> then bigBaskets := bigBaskets - 1;  
+    cl.setHasCollected(true); 
+    return generateBasket(cl.basketRequest) 
+  ) 
+  pre cl in set clients 
+  post if cl.hasCancelled then (RESULT = undefined) else (1=1) and 
+    if cl.hasCollected then (RESULT = undefined) else (1=1) and 
+    if cl.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1 else bigBaskets = bigBaskets~ - 1 and 
+    cl.hasCollected = true; 
+ 
+ 
+  public generateBasket : Utils`BasketType ==> Basket 
+  generateBasket(s) == is not yet specified; 
+   
 end Collective

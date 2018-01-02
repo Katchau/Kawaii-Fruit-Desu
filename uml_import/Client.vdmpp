@@ -1,37 +1,66 @@
 class Client
 instance variables
   public name: Utils`string;
-  hasPaidAnual: bool;
-  hasCollected: bool;
-  hasCancelled: bool;
-  collective: Collective;
-  basketReceived: Basket;
-  public basketRequest: Utils`BasketType;
+  public hasPaidAnual: bool; 
+  public hasCollected: bool; 
+  public hasCancelled: bool; 
+  public collective: Collective; 
+  public basketReceived: Basket; 
+  public basketRequest: Utils`BasketType; 
 
 operations
 	public Client: Utils`string * Utils`BasketType ==> Client
-		Client(n, type) == (
-			name := n;
-			basketRequest := type;
-		)
+		Client(n, type) == ( 
+      name := n; 
+      basketRequest := type; 
+      hasPaidAnual := false; 
+      hasCollected := false; 
+      hasCancelled := false; 
+      --collective := undefined; 
+      --basketReceived := undefined; 
+    ) 
 		pre len n > 0
 		post name = n and basketRequest = type;
 
-  public applyCollective : ()  ==> bool
-  applyCollective() ==
-    is not yet specified;
+   public applyCollective : Collective ==> bool 
+ 	 applyCollective(c) == 
+			return c.addAssociate(self)
+--    	IO`println(name); 
+--    IO`println(basketRequest);    
+--    IO`println(hasCollected);    
+--           
+--    IO`println(hasPaidAnual); 
+--    IO`println(hasCancelled); 
+     
+   pre basketRequest = <Small> or basketRequest = <Big> 
+  --post --if RESULT = true 
+          --then collective = c 
+          --else RESULT <> true 
+          --else collective = undefined 
+     --    and name = name~ and basketRequest = basketRequest~ and hasPaidAnual = hasPaidAnual~  
+      --  and hasCollected = hasCollected~ and hasCancelled = hasCancelled~ 
+        ; 
 
-  public  getBasket : ()  ==> bool
-  getBasket() ==
-    is not yet specified;
+  public  getBasket : ()  ==> () 
+  getBasket() ==  
+    basketReceived := collective.collectBasket(self) 
+  pre hasCollected = false and hasCancelled = false and collective <> undefined 
+      -- and basketRequest <> undefined -- and basketReceived = undefined 
+  post hasCollected = true and hasCancelled = hasCancelled~ --and collective = collective~ 
+      --and basketRequest = basketRequest~ and basketReceived <> undefined; 
+; 
 
-  public  cancelBasket : ()  ==> ?
-  cancelBasket() ==
-    is not yet specified;
+	public setHasCollected: bool ==> () 
+  setHasCollected(hc) == hasCollected := hc 
+  post hasCollected = hc; 
 
-  public  quitCollective : ()  ==> ?
-  quitCollective() ==
-    is not yet specified;
+  public  cancelBasket : ()  ==> () 
+  cancelBasket() == hasCancelled := true 
+  post hasCancelled = true; 
+
+  public  quitCollective : ()  ==> ()
+  quitCollective() == return collective.removeAssociate(self)
+  pre collective <> undefined; -- criar variavel para isto
 
 
 end Client
