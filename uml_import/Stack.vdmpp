@@ -5,8 +5,6 @@ operations
  	public Stack: () ==> Stack
  		Stack() == return self
  		post contents = [];
- 	public clear: () ==> ()
- 		clear() == contents := [];
  	public push: ? ==> ()
  		push(x) == contents := [x] ^ contents
  		post contents = [x] ^ contents~;
