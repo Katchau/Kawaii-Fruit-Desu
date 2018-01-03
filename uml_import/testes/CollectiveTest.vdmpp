@@ -118,12 +118,15 @@ operations
   		dcl map3: Utils`ProdGrams;
   		IO`println("Testing Generate Basket");
   		basket1 := cl.generateBasket(<Small>, cl.prodAvailability);
+  		assertTrue(basket1.size = <Small>);
+  		assertTrue(basket1.totalWeight + 0.1 >= Utils`smallWeight and basket1.totalWeight <= Utils`smallWeight + 0.1 );
+  		assertTrue(card dom basket1.content = 7);
   		map3 := cl.subtractMaps(cl.prodAvailability, basket1.content);
-  		basket1 := cl.generateBasket(<Small>, map3);
-  		map3 := cl.subtractMaps(map3, basket1.content);
   		basket1 := cl.generateBasket(<Big>, map3);
+  		assertTrue(basket1.size = <Big>);
+  		assertTrue(basket1.totalWeight + 0.1 >= Utils`bigWeight and basket1.totalWeight <= Utils`bigWeight + 0.1 );
+  		assertTrue(card dom basket1.content = 8);
   		map3 := cl.subtractMaps(map3, basket1.content);
-  		IO`println(basket1.getTotalWeight(basket1.content));
   	);
   
   public testCreateBaskets: () ==> ()
@@ -151,6 +154,48 @@ operations
   		assertTrue(cli3 not in set elems cl.waiting.contents);
   		assertEqual([], cl.waiting.contents);
   		assertTrue(cli3 in set cl.clients);
+  	);
+  
+  public testAddFromWaiting2: () ==> ()
+  	testAddFromWaiting2() == (
+  		dcl cl2: Collective := new Collective("Watford");
+  		IO`println("Testing adding another client from the waiting list");
+  		cl2.addFarmer(farmer1);
+  		assertTrue(cl2.addAssociate(cli1));
+  		assertFalse(cl2.addAssociate(cli2));
+  		assertEqual(<Big>, cl2.waiting.top().basketRequest);
+  		assertEqual(cli2, cl2.waiting.top());
+  		assertTrue(cli2 not in set cl2.clients);
+  		assertFalse(cl2.addFromWaitingList());
+  		cl2.removeAssociate(cli1);
+  		assertTrue(cl2.canAddAssociate(cl2.smallBaskets,cl2.bigBaskets+1));
+  		assertTrue(cl2.addFromWaitingList());
+  		assertTrue(cli2 not in set elems cl2.waiting.contents);
+  		assertEqual([], cl2.waiting.contents);
+  		assertTrue(cli2 in set cl2.clients);
+  		cl2.removeAssociate(cli2);
+  		cl2.removeFarmer(farmer1);
+  	);
+  
+   public testKickToWaiting2: () ==> ()
+  	testKickToWaiting2() == (
+  		dcl cl2: Collective := new Collective("Watford");
+  		IO`println("Testing kicking another client to the waiting list");
+  		cl2.addFarmer(farmer1);
+  		assertTrue(cl2.addAssociate(cli2));
+  		cl2.removeFarmer(farmer1);
+  		assertTrue(cli2 in set cl2.clients);
+  		assertTrue(cli2 not in set elems cl2.waiting.contents);
+  		assertEqual(1, cl2.bigBaskets);
+  		assertEqual(0, cl2.smallBaskets);
+  		
+  		cl2.kickClients();
+  		assertTrue(cli2 not in set cl2.clients);
+  		assertTrue(cli2 in set elems cl2.waiting.contents);
+  		assertEqual(0, cl.bigBaskets);
+  		assertEqual(0, cl.smallBaskets);
+  		assertEqual({}, cl.clients);
+  		
   	);
   
   public testRemoveClient: () ==> ()
@@ -239,6 +284,7 @@ operations
   			assertEqual(false,cli.hasCancelled);
   			assertTrue(not cli.hasCollected);
   			assertTrue(cli.undefinedBasket);
+  			assertTrue(not cli.hasCancelled and not cli.hasCollected and cli.undefinedBasket);
   		);
 			cl.newYear();			
 			for all cli in set cl.clients do (
@@ -246,6 +292,7 @@ operations
   			assertTrue(not cli.hasCollected);
   			assertTrue(cli.undefinedBasket);
   			assertTrue(not cli.hasPaidAnual);
+  			assertTrue(not cli.hasCancelled and not cli.hasCollected and cli.undefinedBasket and not cli.hasPaidAnual);
   		)
   	);
   
@@ -259,12 +306,14 @@ operations
   		testGetClient();
   		testGenerateBasket();
   		testCreateBaskets();
+  		testNewWeekAndYear();
   		testRemoveClient();
   		testAddFromWaiting();
   		testEmptyClients();
   		testAddClient();
   		testRemoveFarmer();
   		testKickClients();
-  		testNewWeekAndYear();
+  		testAddFromWaiting2();
+  		testKickToWaiting2();
   	);
 end CollectiveTest

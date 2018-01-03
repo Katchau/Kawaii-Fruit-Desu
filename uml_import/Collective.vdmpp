@@ -75,7 +75,7 @@ operations
 						)
 						else if p not in set dom ret.content 
 						then (
-							ret.add(p, (minSize - curProds(prod)));
+							ret.add(p, minSize + (minSize - curProds(prod)));
 							ret.add(prod, curProds(prod));
 							stopCycle := true
 						);
@@ -183,9 +183,8 @@ operations
   	)
     pre cli in set clients and cli not in set elems waiting.contents
     post cli not in set clients and
-    	if cli in set clients~ and cli.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1
-    	else if cli in set clients~ and cli.basketRequest = <Big> then bigBaskets = bigBaskets~ - 1
-    	else true;
+    	if cli.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1
+    	else bigBaskets = bigBaskets~ - 1;
 	
 	public addFromWaitingList: () ==> bool
 		addFromWaitingList() == (
@@ -246,6 +245,7 @@ operations
   			then prodAvailability := prodAvailability ++ {prod |-> farmer.production(prod)}
   			else prodAvailability := prodAvailability ++ {prod |-> farmer.production(prod)+prodAvailability(prod)}
   		);
+  		farmer.apply(self)
   	)
   	pre farmer not in set farmers
   	post farmer in set farmers and farmers = farmers~ union {farmer}
@@ -262,6 +262,7 @@ operations
   			then prodAvailability := {prod} <-: prodAvailability
   			else prodAvailability := prodAvailability ++ {prod |-> prodAvailability(prod) - farmer.production(prod)};
   		);
+  		farmer.quit()
   	)
   	pre farmer in set farmers
   	post farmer not in set farmers and farmers = farmers~ \ {farmer}

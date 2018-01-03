@@ -4,6 +4,7 @@ instance variables
 	product2: Product := new Product("banana");
 	production1: Utils`ProdGrams := {product1 |-> 1000};
 	farmer: Farmer := new Farmer("FarmBoy", production1);
+	cl: Collective := new Collective("Paranhos");
 operations
   public testConstructor: () ==> ()
   	testConstructor() == (
@@ -11,6 +12,8 @@ operations
     	assertEqual("FarmBoy", farmer.name);
     	assertEqual(production1, farmer.production);
     	assertTrue(forall gr in set rng farmer.production & gr > 0);
+    	assertEqual("fake", farmer.collective.location);
+    	assertFalse(farmer.hasCollective)
   	);
   
   public testAddRemoveProduct: () ==> ()
@@ -26,12 +29,38 @@ operations
   		assertTrue(product2 not in set dom farmer.production);
   		assertEqual(production1, farmer.production);
   	);
+  	
+  public testCollectiveFunctions: () ==> ()
+  	testCollectiveFunctions() == (
+  		IO`println("Testing collective related functions");
+  		assertFalse(farmer.hasCollective);
+  		assertEqual("fake", farmer.collective.location);
+  		farmer.apply(cl);
+  		assertTrue(farmer.hasCollective);
+  		assertEqual(cl, farmer.collective);
+  		
+  		farmer.quit();
+  		assertFalse(farmer.hasCollective);
+  		assertEqual("fake", farmer.collective.location);
+  	);
+		
+	public testUpdateFarmer: () ==> ()
+		testUpdateFarmer() == (
+			cl.addFarmer(farmer);
+			assertTrue(farmer.hasCollective);
+  		assertEqual(cl, farmer.collective);
+			farmer.updateCollectiveInfo();
+  		assertTrue(farmer.hasCollective);
+  		assertEqual(cl, farmer.collective);
+		);
 		
 	public testAll: () ==> ()
   	testAll() == (
   		IO`println("Testing Farmer Class Functions");
   		testConstructor();
   		testAddRemoveProduct();
+  		testCollectiveFunctions();
+  		testUpdateFarmer();
   	);
 
 end FarmerTest

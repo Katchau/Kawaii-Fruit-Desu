@@ -2,7 +2,8 @@ class Farmer
 instance variables
 	public name: Utils`string;
   public production: Utils`ProdGrams; -- products and the corresponding production of it
-  --collective:Collective;
+  public collective: Collective := new Collective("fake");
+  public hasCollective: bool := false;
 
 operations
 	public Farmer: Utils`string * Utils`ProdGrams ==> Farmer
@@ -14,14 +15,31 @@ operations
 	pre prods <> {|->} and forall gr in set rng prods & gr > 0
 	post name = n and prods = production;
 
-  public apply : ()  ==> bool
-  	apply() ==
-    	is not yet specified;
+  public apply : Collective  ==> ()
+  	apply(cl) == (
+  		hasCollective := true;
+  		collective := cl
+  	)
+  	pre hasCollective = false
+  	post hasCollective and collective = cl;
 
-  public  quit : ()  ==> ?
-  	quit() ==
-    	is not yet specified;
-    
+  public  quit : ()  ==> ()
+  	quit() == (
+  		hasCollective := false;
+  		collective := new Collective("fake")
+  	)
+  	pre hasCollective
+  	post not hasCollective and collective.location = "fake";
+   
+  public updateCollectiveInfo: () ==> ()
+  	updateCollectiveInfo() == (
+  		dcl cl: Collective := collective;
+  		cl.removeFarmer(self);
+  		cl.addFarmer(self);
+  	)
+  	pre hasCollective
+  	post hasCollective;
+  
   public addProduct: Product * real ==> ()
   	addProduct(prod, gr) == production := production ++ {prod |-> gr}
   	pre prod not in set dom production and gr > 0
@@ -31,16 +49,5 @@ operations
 		removeProduct(prod) == production := {prod} <-: production
 		pre prod in set dom production
 		post production = {prod} <-: production~ and prod not in set dom production;
-
-  public requestProduction : Product * nat1 ==> nat1
-  	requestProduction(prod, quantity) == 
-  		if quantity < production(prod) then return quantity
-  		else return production(prod)
-  	pre prod in set dom production and quantity > 0
-  	post RESULT <= production(prod) and RESULT <= quantity and
-  		if quantity < production(prod) then RESULT = quantity
-  		else RESULT = production(prod);
-  	
-
 
 end Farmer
