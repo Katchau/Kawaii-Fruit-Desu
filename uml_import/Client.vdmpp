@@ -33,29 +33,19 @@ operations
 			return not (undefinedCollective)
    )
    post undefinedCollective = false;
-  -- pre basketRequest = <Small> or basketRequest = <Big>
-   --post true; 
-  -- post if RESULT = true 
-    --      then collective = c 
-      --    and undefinedCollective = false
-        --  else undefinedCollective = true
-          --else collective = undefined 
-     --    and name = name~ and basketRequest = basketRequest~ and hasPaidAnual = hasPaidAnual~  
-      --  and hasCollected = hasCollected~ and hasCancelled = hasCancelled~ 
-       -- ; 
 
   public  getBasket : ()  ==> () 
   getBasket() ==  (
-  	dcl possibleBasket: Basket := collective.collectBasket(self);
+  	dcl possibleBasket: Basket;
+  
+  	possibleBasket := collective.collectBasket(self);
+  	
     if not undefinedBasket
-    then basketReceived := possibleBasket
+   		 then basketReceived := possibleBasket
     )
-  pre hasCollected = false and hasCancelled = false and collective <> undefined 
-      -- and basketRequest <> undefined -- and basketReceived = undefined 
+  pre hasCollected = false and not undefinedCollective = true
   post if hasCollected = true then (not undefinedBasket and hasCollected )
-  				else (undefinedBasket and not hasCollected) --and hasCancelled = hasCancelled~ --and collective = collective~ 
-      --and basketRequest = basketRequest~ and basketReceived <> undefined; 
-; 
+  				else (undefinedBasket and not hasCollected); 
 
 	 public  quitCollective : ()  ==> bool
   quitCollective() == (

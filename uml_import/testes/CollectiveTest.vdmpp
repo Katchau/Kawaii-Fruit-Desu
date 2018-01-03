@@ -296,6 +296,30 @@ operations
   		)
   	);
   
+  public testCollectBasket: () ==> ()
+  testCollectBasket() == (
+  	dcl r1: Basket ;
+  	dcl r2: Basket ;
+  	
+  	r1 :=	cl.collectBasket(cli1);
+  	assertTrue(cli1.hasCollected);
+  	assertTrue(not cli1.undefinedBasket);
+  	
+  	r1 :=	cl.collectBasket(cli1);  	
+  	assertTrue(cli1.hasCollected);
+  	assertTrue(not cli1.undefinedBasket);
+  	
+  	cl.baskets := [];
+  	cli1.setHasCollected(false);
+  	cli1.setUndefinedBasket(true);
+  	r1 :=	cl.collectBasket(cli1);  	
+  	assertTrue(cli1.undefinedBasket);
+  	
+  	cli2.cancelBasket();
+  	r2 := cl.collectBasket(cli2);  	
+  	assertTrue(not cli2.hasCollected);
+  );
+  
   public testAll: () ==> ()
   	testAll() == (
   		testConstructor();
@@ -306,6 +330,7 @@ operations
   		testGetClient();
   		testGenerateBasket();
   		testCreateBaskets();
+  		testCollectBasket();
   		testNewWeekAndYear();
   		testRemoveClient();
   		testAddFromWaiting();

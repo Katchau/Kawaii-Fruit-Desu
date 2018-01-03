@@ -71,6 +71,11 @@ operations
   		if(cli.undefinedBasket) then assertEqual(false, cli.hasCollected)
   		else assertTrue(cli.hasCollected);
   		
+  		cli.setHasCollected(false);
+  		cli.cancelBasket();
+  		cli.getBasket();
+  		assertTrue(cli.undefinedBasket);
+  		
   		IO`println("-- Passed get basket");
   	);
   	
