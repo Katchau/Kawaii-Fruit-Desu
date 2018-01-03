@@ -275,8 +275,14 @@ operations
 		dcl p1: Product := new Product("apple");
 		dcl p2: Product := new Product("banana");
 		
-    if cl.hasCancelled then (cl.setUndefinedBasket(true); return (new Basket({p1|->100, p2|->300}, <Big>)););
-    if cl.hasCollected then (cl.setUndefinedBasket(false); return (new Basket({p1|->100, p2|->300}, <Big>)););
+    if cl.hasCancelled then(
+    	cl.setUndefinedBasket(true); 
+    	return (new Basket({p1|->100, p2|->300}, <Big>));
+    );
+    if cl.hasCollected then(
+    	cl.setUndefinedBasket(false); 
+    	return (new Basket({p1|->100, p2|->300}, <Big>));
+    );
     
     if cl.basketRequest = <Big> then 
     	for all b in set basketSet do (
