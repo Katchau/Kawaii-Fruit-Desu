@@ -223,10 +223,8 @@ operations
 			)
 		)
 		pre card clients > 0
-		post forall cli in set clients~ &
-			if cli not in set elems waiting.contents
-			then cli in set clients
-			else cli in set elems waiting.contents and cli not in set clients;
+		post forall cli in set clients~ \ clients &
+			cli in set elems waiting.contents and cli not in set clients;
 	
 	public getFarmer: Utils`string ==> Farmer
 		getFarmer(fname) == (
@@ -269,10 +267,6 @@ operations
   		and forall prod in set dom farmer.production & if prodAvailability~(prod) = farmer.production(prod)
   		then prod not in set dom prodAvailability
   		else prodAvailability(prod) = prodAvailability~(prod) - farmer.production(prod);
-
-  public  updateRequests : ()  ==> ?
-  updateRequests() ==
-    is not yet specified;
 
 	public collectBasket : Client ==>  Basket  
   collectBasket(cl) == (
