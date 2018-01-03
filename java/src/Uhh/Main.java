@@ -86,7 +86,9 @@ public class Main {
                     System.err.println("No clients on collective!");
                     break;
                 }
-                if(!c.waiting.contents.isEmpty() && !c.addFromWaitingList())c.kickClients();
+                boolean added = false;
+                if(!c.waiting.contents.isEmpty())added = c.addFromWaitingList();
+                if(!c.clients.isEmpty() && !added)c.kickClients();
                 c.newWeek();
                 c.createBaskets();
                 System.out.println("Updated baskets to collect!");
