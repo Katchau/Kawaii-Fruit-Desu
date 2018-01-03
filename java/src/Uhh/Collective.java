@@ -528,14 +528,6 @@ public class Collective {
   public String toString() {
 
     return "Collective{"
-        + "basketSmall = "
-        + Utils.toString(basketSmall)
-        + ", basketBig = "
-        + Utils.toString(basketBig)
-        + ", minSmall = "
-        + Utils.toString(minSmall)
-        + ", minBig = "
-        + Utils.toString(minBig)
         + ", clients := "
         + Utils.toString(clients)
         + ", farmers := "

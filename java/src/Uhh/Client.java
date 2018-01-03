@@ -103,8 +103,6 @@ public class Client {
         + Utils.toString(hasCancelled)
         + ", undefinedCollective := "
         + Utils.toString(undefinedCollective)
-        + ", collective := "
-        + Utils.toString(collective)
         + ", undefinedBasket := "
         + Utils.toString(undefinedBasket)
         + ", basketReceived := "

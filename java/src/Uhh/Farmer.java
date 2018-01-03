@@ -60,8 +60,6 @@ public class Farmer {
         + Utils.toString(name)
         + ", production := "
         + Utils.toString(production)
-        + ", collective := "
-        + Utils.toString(collective)
         + ", hasCollective := "
         + Utils.toString(hasCollective)
         + "}";

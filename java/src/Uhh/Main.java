@@ -12,6 +12,7 @@ public class Main {
     public static ArrayList<Collective> collectives = new ArrayList<>();
     public static ArrayList<Client> clients = new ArrayList<>();
     public static ArrayList<Farmer> farmers = new ArrayList<>();
+    public static Scanner in = new Scanner(System.in);
     // System.out.print("\033[H\033[2J"); to clear screen
 
     public static void displayArray(ArrayList<?> list){
@@ -47,9 +48,7 @@ public class Main {
 
     public static void collectiveOptions(int option){
         System.out.println("Please write the name of the collective!");
-        Scanner in = new Scanner(System.in);
         String name = in.next();
-        in.close();
         Collective c = getCollective(name);
         if(c == null){
             System.err.println("No such collective on " + name);
@@ -58,9 +57,7 @@ public class Main {
         switch (option){
             case 3:
                 System.out.println("Write the name of the farmer you wish to add!");
-                //in = new Scanner(System.in);
                 String nameF = in.next();
-                //in.close();
                 Farmer f = getFarmer(nameF);
                 if(f == null){
                     System.err.println("Farmer not found! ");
@@ -75,9 +72,7 @@ public class Main {
                 break;
             case 4:
                 System.out.println("Write the name of the farmer you wish to remove!");
-                //in = new Scanner(System.in);
                 String nameF2 = in.next();
-                //in.close();
                 Farmer f2 = c.getFarmer(nameF2);
                 if(f2 == null){
                     System.err.println("Farmer not found on this collective! ");
@@ -87,7 +82,11 @@ public class Main {
                 System.out.println("Farmer " + nameF2 + " removed the collective " + name);
                 break;
             case 5:
-                if(!c.addFromWaitingList())c.kickClients();
+                if(c.clients.isEmpty() && c.waiting.contents.isEmpty()){
+                    System.err.println("No clients on collective!");
+                    break;
+                }
+                if(!c.waiting.contents.isEmpty() && !c.addFromWaitingList())c.kickClients();
                 c.newWeek();
                 c.createBaskets();
                 System.out.println("Updated baskets to collect!");
@@ -97,9 +96,7 @@ public class Main {
 
     public static void createCollective(){
         System.out.println("Please write the location of your collective!(Size of location > 0)");
-        Scanner in = new Scanner(System.in);
         String name = in.next();
-        in.close();
         if(name.length() == 0){
             System.out.println("Please write a bigger location next time!");
             return;
@@ -112,9 +109,7 @@ public class Main {
         System.out.println("Collectve Menu");
         System.out.println("Please select a desired function! (1/6)");
         int option;
-        Scanner in;
         boolean invalid = false;
-        in = new Scanner(System.in);
         while(!invalid){
             System.out.println("1 -- View Collectives");
             System.out.println("2 -- Create Collective");
@@ -122,7 +117,6 @@ public class Main {
             System.out.println("4 -- Remove Farmer");
             System.out.println("5 -- Set Up Week");
             option = in.nextInt();
-            //in.close();
             switch (option) {
                 case 1:
                     displayArray(collectives);
@@ -149,9 +143,7 @@ public class Main {
 
     public static void farmerOptions(int option){
         System.out.println("Please write the name of the Farmer!");
-        Scanner in = new Scanner(System.in);
         String name = in.next();
-        in.close();
         Farmer c = getFarmer(name);
         if(c == null){
             System.err.println("No such farmer " + name);
@@ -160,56 +152,25 @@ public class Main {
         switch (option){
             case 3:
                 System.out.println("Write the name of the Product to add and the production!");
-                //in = new Scanner(System.in);
                 String nameProd = in.next();
-                in.close();
-                //in = new Scanner(System.in);
                 Number n = in.nextDouble();
-                in.close();
                 //VDMMap map1 = MapUtil.map(new Maplet(new Product(nameProd), n));
                 c.addProduct(new Product(nameProd), n);
                 System.out.println("Added product to production list of farmer " + name);
                 break;
             case 4:
                 System.out.println("Write the name of the Product to remove!");
-                //in = new Scanner(System.in);
                 String nameProd1 = in.next();
-                in.close();
                 //VDMMap map1 = MapUtil.map(new Maplet(new Product(nameProd), n));
                 c.removeProduct(new Product(nameProd1));
                 System.out.println("Removed product to production list of farmer " + name);
-                break;
-            case 5:
-                VDMMap map1 = MapUtil.map(
-                                new Maplet(new Product("banana"), 1000L),
-                                new Maplet(new Product("apple"), 1000L),
-                                new Maplet(new Product("orange"), 1000L),
-                                new Maplet(new Product("pear"), 1000L),
-                                new Maplet(new Product("tomato"), 1000L),
-                                new Maplet(new Product("mango"), 1000L),
-                                new Maplet(new Product("onion"), 1000L),
-                                new Maplet(new Product("troncha"), 1000L));
-                VDMMap map2 = MapUtil.map(
-                                new Maplet(new Product("banana"), 1000L),
-                                new Maplet(new Product("apple"), 1000L),
-                                new Maplet(new Product("orange"), 1000L),
-                                new Maplet(new Product("tomato"), 1000L),
-                                new Maplet(new Product("pinneapple"), 1000L),
-                                new Maplet(new Product("onion"), 1000L),
-                                new Maplet(new Product("troncha"), 1000L));
-                farmers.add(new Farmer("Default1", Utils.copy(map1)));
-                farmers.add(new Farmer("Default2", Utils.copy(map1)));
-                farmers.add(new Farmer("Default3", Utils.copy(map2)));
-                System.out.println("Added Default Farmers!");
                 break;
         }
     }
 
     public static void createFarmer(){
         System.out.println("Please write your name in order to register!(Size of name > 0)");
-        Scanner in = new Scanner(System.in);
         String name = in.next();
-        //in.close();
         if(name.length() == 0){
             System.out.println("Please write a bigger name next time!");
             return;
@@ -218,13 +179,9 @@ public class Main {
         while(true){
             System.out.println("Please write the name of the product you wish to add and the total production of it");
             System.out.println("To finish please write 'over'");
-            //in = new Scanner(System.in);
             String nameProd = in.next();
-            //in.close();
             if(nameProd.equals("over"))break;
-            //in = new Scanner(System.in);
             Number n = in.nextDouble();
-            //in.close();
             map1 = MapUtil.override(Utils.copy(map1),MapUtil.map(new Maplet(new Product(nameProd), n)));
         }
         farmers.add(new Farmer(name, map1));
@@ -235,8 +192,6 @@ public class Main {
         System.out.println("Farmer Menu");
         System.out.println("Please select a desired function! (1/5)");
         int option;
-        Scanner in;
-        in = new Scanner(System.in);
         boolean invalid = false;
         while(!invalid){
             System.out.println("1 -- View Farmers");
@@ -245,7 +200,6 @@ public class Main {
             System.out.println("4 -- Remove Product from Farmer");
             System.out.println("5 -- Create Default Farmers");
             option = in.nextInt();
-            //in.close();
             switch (option) {
                 case 1:
                     displayArray(farmers);
@@ -260,7 +214,27 @@ public class Main {
                     farmerOptions(4);
                     break;
                 case 5:
-                    farmerOptions(5);
+                    VDMMap map1 = MapUtil.map(
+                            new Maplet(new Product("banana"), 1000L),
+                            new Maplet(new Product("apple"), 1000L),
+                            new Maplet(new Product("orange"), 1000L),
+                            new Maplet(new Product("pear"), 1000L),
+                            new Maplet(new Product("tomato"), 1000L),
+                            new Maplet(new Product("mango"), 1000L),
+                            new Maplet(new Product("onion"), 1000L),
+                            new Maplet(new Product("troncha"), 1000L));
+                    VDMMap map2 = MapUtil.map(
+                            new Maplet(new Product("banana"), 1000L),
+                            new Maplet(new Product("apple"), 1000L),
+                            new Maplet(new Product("orange"), 1000L),
+                            new Maplet(new Product("tomato"), 1000L),
+                            new Maplet(new Product("pinneapple"), 1000L),
+                            new Maplet(new Product("onion"), 1000L),
+                            new Maplet(new Product("troncha"), 1000L));
+                    farmers.add(new Farmer("Default1", Utils.copy(map1)));
+                    farmers.add(new Farmer("Default2", Utils.copy(map1)));
+                    farmers.add(new Farmer("Default3", Utils.copy(map2)));
+                    System.out.println("Added Default Farmers!");
                     break;
                 default:
                     System.out.println("Invalid option!");
@@ -272,26 +246,20 @@ public class Main {
 
     public static void createUser(){
         System.out.println("Please write your name in order to register!(Size of name > 0)");
-        Scanner in = new Scanner(System.in);
         String name = in.next();
-        in.close();
         if(name.length() == 0){
             System.out.println("Please write a bigger name next time!");
             return;
         }
         System.out.println("Please write the type of basket you desire! (1 for small, 2 for big)");
-        in = new Scanner(System.in);
         int option = in.nextInt();
-        in.close();
         if (option == 1) clients.add(new Client(name, Uhh.quotes.SmallQuote.getInstance()));
         else clients.add(new Client(name, Uhh.quotes.BigQuote.getInstance()));
     }
 
     public static void userOptions(int option){
         System.out.println("Please write the name of the client!");
-        Scanner in = new Scanner(System.in);
         String name = in.next();
-        in.close();
         Client c = getClient(name);
         if(c == null){
             System.err.println("No such user " + name);
@@ -299,10 +267,8 @@ public class Main {
         }
         switch (option){
             case 3:
-                System.out.println("3 -- Write the name of the Collective");
-                //in = new Scanner(System.in);
+                System.out.println("Write the name of the Collective");
                 name = in.next();
-                in.close();
                 Collective cl = getCollective(name);
                 if(!c.undefinedCollective){
                     System.err.println("User is already in a collective!");
@@ -348,9 +314,7 @@ public class Main {
         System.out.println("Client Menu");
         System.out.println("Please select a desired function! (1/6)");
         int option;
-        Scanner in;
         boolean invalid = false;
-        in = new Scanner(System.in);
         while(!invalid){
             System.out.println("1 -- View Clients");
             System.out.println("2 -- Create Client");
@@ -359,7 +323,6 @@ public class Main {
             System.out.println("5 -- Get Basket");
             System.out.println("6 -- Cancel Basket");
             option = in.nextInt();
-            //in.close();
             switch (option) {
                 case 1:
                     displayArray(clients);
@@ -390,8 +353,6 @@ public class Main {
     public static void main(String [] arg){
         System.out.println("Welcome to the Ugly Fruit Project!");
         System.out.println("Please select a menu! (1/3)");
-        Scanner in;
-        in = new Scanner(System.in);
         boolean invalid = false;
         while(!invalid) {
             System.out.print("\033[H\033[2J");
@@ -399,7 +360,6 @@ public class Main {
             System.out.println("2 -- Farmer Menu");
             System.out.println("3 -- Collective Menu");
             int option = in.nextInt();
-            //in.close();
             switch (option) {
                 case 1:
                     userMenu();
@@ -413,6 +373,7 @@ public class Main {
                 default:
                     System.out.println("Invalid option! Exiting Program");
                     invalid = true;
+                    in.close();
                     break;
             }
         }

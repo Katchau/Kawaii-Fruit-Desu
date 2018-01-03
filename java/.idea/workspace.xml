@@ -35,8 +35,8 @@
       <file leaf-file-name="Farmer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Uhh/Farmer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="819">
-              <caret line="43" column="57" lean-forward="false" selection-start-line="43" selection-start-column="51" selection-end-line="43" selection-end-column="57" />
+            <state relative-caret-position="258">
+              <caret line="61" column="36" lean-forward="false" selection-start-line="61" selection-start-column="36" selection-end-line="61" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -45,8 +45,8 @@
       <file leaf-file-name="Client.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Uhh/Client.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="273">
-              <caret line="35" column="23" lean-forward="false" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="23" />
+            <state relative-caret-position="317">
+              <caret line="104" column="45" lean-forward="false" selection-start-line="104" selection-start-column="45" selection-end-line="104" selection-end-column="45" />
               <folding />
             </state>
           </provider>
@@ -55,8 +55,8 @@
       <file leaf-file-name="Main.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Uhh/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-6441">
-              <caret line="92" column="63" lean-forward="false" selection-start-line="92" selection-start-column="63" selection-end-line="92" selection-end-column="63" />
+            <state relative-caret-position="-537">
+              <caret line="259" column="30" lean-forward="false" selection-start-line="259" selection-start-column="23" selection-end-line="259" selection-end-column="30" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -67,8 +67,8 @@
       <file leaf-file-name="Collective.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Uhh/Collective.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3108">
-              <caret line="508" column="13" lean-forward="false" selection-start-line="508" selection-start-column="8" selection-end-line="508" selection-end-column="13" />
+            <state relative-caret-position="196">
+              <caret line="292" column="14" lean-forward="false" selection-start-line="292" selection-start-column="13" selection-end-line="292" selection-end-column="14" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -79,8 +79,8 @@
       <file leaf-file-name="Stack.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Uhh/Stack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="6" column="13" lean-forward="false" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+            <state relative-caret-position="321">
+              <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -101,6 +101,9 @@
       <find>Uhh.que</find>
       <find>throw</find>
       <find>new Scanner</find>
+      <find>new Scan</find>
+      <find>close</find>
+      <find>Collective</find>
     </findStrings>
   </component>
   <component name="GradleLocalSettings">
@@ -111,8 +114,10 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/src/Uhh/Farmer.java" />
         <option value="$PROJECT_DIR$/src/Uhh/Collective.java" />
         <option value="$PROJECT_DIR$/src/Uhh/Main.java" />
+        <option value="$PROJECT_DIR$/src/Uhh/Client.java" />
       </list>
     </option>
   </component>
@@ -306,16 +311,15 @@
       <option name="presentableId" value="Default" />
       <updated>1514940822307</updated>
       <workItem from="1514940823640" duration="9894000" />
-      <workItem from="1514985741192" duration="7545000" />
+      <workItem from="1514985741192" duration="9143000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="18098000" />
+    <option name="totallyTimeSpent" value="19696000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -326,7 +330,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35307518" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35307518" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -417,14 +421,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Uhh/Stack.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="6" column="13" lean-forward="false" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Uhh/CollectiveTest.java" />
     <entry file="file://$PROJECT_DIR$/src/Uhh/Product.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -491,26 +487,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Uhh/Client.java">
+    <entry file="file://$PROJECT_DIR$/src/Uhh/Farmer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="35" column="23" lean-forward="false" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="23" />
+        <state relative-caret-position="258">
+          <caret line="61" column="36" lean-forward="false" selection-start-line="61" selection-start-column="36" selection-end-line="61" selection-end-column="36" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Uhh/Farmer.java">
+    <entry file="file://$PROJECT_DIR$/src/Uhh/Client.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="819">
-          <caret line="43" column="57" lean-forward="false" selection-start-line="43" selection-start-column="51" selection-end-line="43" selection-end-column="57" />
+        <state relative-caret-position="317">
+          <caret line="104" column="45" lean-forward="false" selection-start-line="104" selection-start-column="45" selection-end-line="104" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Uhh/Stack.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="321">
+          <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Uhh/Collective.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3108">
-          <caret line="508" column="13" lean-forward="false" selection-start-line="508" selection-start-column="8" selection-end-line="508" selection-end-column="13" />
+        <state relative-caret-position="196">
+          <caret line="292" column="14" lean-forward="false" selection-start-line="292" selection-start-column="13" selection-end-line="292" selection-end-column="14" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -519,8 +523,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Uhh/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6441">
-          <caret line="92" column="63" lean-forward="false" selection-start-line="92" selection-start-column="63" selection-end-line="92" selection-end-column="63" />
+        <state relative-caret-position="-537">
+          <caret line="259" column="30" lean-forward="false" selection-start-line="259" selection-start-column="23" selection-end-line="259" selection-end-column="30" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
