@@ -83,23 +83,39 @@ public class Main {
                 name = in.next();
                 in.close();
                 Collective cl = getCollective(name);
+                if(!c.undefinedCollective){
+                    System.err.println("User is already in a collective!");
+                    break;
+                }
                 if(c.applyCollective(cl)) System.out.println("User added to the collective " + name);
                 else System.out.println("User added to the waiting list of the " + name);
                 break;
             case 4:
-                c.quitCollective();
+                if(!c.undefinedCollective)c.quitCollective();
+                else{
+                    System.err.println("User does not have a collective!");
+                    break;
+                }
                 System.out.println("User quit his collective!");
                 break;
             case 5:
-                if(!c.hasCollected)c.getBasket();
+                if(c.undefinedCollective){
+                    System.err.println("User is not registered in a collective!");
+                    break;
+                }
+                if(!c.hasCollected || !c.hasCancelled)c.getBasket();
                 else{
-                    System.err.println("User already got his basket!");
+                    System.err.println("User already got his basket or cancelled it!");
                     break;
                 }
                 System.out.println("The user got the following basket");
                 System.out.println(c.basketReceived.toString());
                 break;
             case 6:
+                if(c.undefinedCollective){
+                    System.err.println("User is not registered in a collective!");
+                    break;
+                }
                 c.cancelBasket();
                 System.out.println("The user cancelled the basket for the week!");
                 break;
