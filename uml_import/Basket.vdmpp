@@ -1,16 +1,23 @@
 class Basket
-
+/*
+	Represents a basket full of products, which will be given out to a Client by the Collective 
+*/
 instance variables
   public totalWeight: real;
   public content: Utils`ProdGrams;
   public size:Utils`BasketType;
 
 functions
+	--Calculates the total weight of products in the basket using the 'content' map
+	--prods: map with the products in the basket and their respective weights
 	public getTotalWeight: Utils`ProdGrams -> real
 		getTotalWeight(prods) == if prods = {|->} then 0
 		else let p in set dom prods in prods(p) + getTotalWeight({p} <-: prods)
 
 operations
+	--Constructor
+	--prods: map with the products in the basket and their respective weights
+	--s: size of the basket
 	public Basket: Utils`ProdGrams * Utils`BasketType  ==> Basket
 	Basket(prods, s) == (
 		content := prods;
@@ -20,7 +27,11 @@ operations
 	)
 	post size = s and content = prods;
 
-  public  add : Product * real ==> () -- por alteracao dos parametros no uml -- alterar return no uml
+	--Adds new product to the basket
+	--Updates 'content' and 'totalWeight'
+	--prod: product to be added
+	--gr: amount of product to add
+  public  add : Product * real ==> ()
 	  add(prod, gr) == (
 	    content := content ++ {prod |-> gr};
 	    totalWeight := getTotalWeight(content)
@@ -28,7 +39,10 @@ operations
 	pre  gr > 0 and prod not in set dom content
 	post prod in set dom content and totalWeight = totalWeight~ + gr; 
 	  
-	  
+	--Increases the total amount of a product already in the bag
+	--Updates 'content' and 'totalWeight'
+	--prod: product to be updated
+	--gr: amount of the product to add to the basket
   public  updateProductQuantity  : Product * real ==> () -- criar no uml
 	  updateProductQuantity(prod, gr) == (
 	  	content := content ++ {prod |-> (content(prod) + gr)};
@@ -37,7 +51,9 @@ operations
   pre  content(prod) + gr > 0 and prod in set dom content and prod in set dom content
 	post prod in set dom content and content(prod) = content~(prod) + gr;
     
-
+	--Remove product from bag 
+	--Removed from 'content' and from 'totalWeight'
+	--prod: product to be removed
   public  remove : Product ==> () -- alterar return no uml
 	  remove(prod) ==(
 	    content := {prod} <-: content;
@@ -46,6 +62,8 @@ operations
 	pre prod in set dom content
 	post prod not in set dom content and totalWeight = totalWeight~ - content~(prod);
 
+	--Returns the weight of a product in the basket, according to the 'content' map
+	--prod: product whose weight is returned
   public  getQuantity : Product ==> real -- alterar return no uml
   	getQuantity(prod) == return content(prod)
   pre prod in set dom content

@@ -4,10 +4,16 @@ values
 	public smallWeight = 4000;
 types
   public string = seq of char;
+  --Type used for basket size 
 	public BasketType = <Big> | <Small>;
+	--Type used to map a product to it's quantity in grams
 	public ProdGrams = map Product to real
-	inv ProdGrams == not exists p1, p2 in set dom ProdGrams & p1 <> p2 and p1.is_equal(p2); -- ver se é preciso isto
+	--Invariant to make sure no two products are the same
+	inv ProdGrams == not exists p1, p2 in set dom ProdGrams & p1 <> p2 and p1.is_equal(p2);
 functions
+	--Compares two strings
+	--s1: string to compare
+	--s2: string to compare
 	public stringsEquals: string * string -> bool
 	stringsEquals(s1,s2) == s1 = s2;
 end Utils

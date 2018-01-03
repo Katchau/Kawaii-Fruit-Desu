@@ -1,4 +1,7 @@
 class Collective
+/*
+	Represents a collective, which deals with farmers to make the necessary baskets for the clients
+*/
 values
 	private basketSmall = 7;
 	private basketBig = 8;
@@ -17,6 +20,9 @@ instance variables
   public prodAvailability: Utils`ProdGrams; -- indica a disponibilidade de producao em gramas de cada produto
   
 functions
+	--Subtracts a map's codomain according to another map's codomain, where their domain matches
+	--p1: map to be changed
+	--p2: map with the quantities to subtract to p1
 	public subtractMaps: Utils`ProdGrams * Utils`ProdGrams -> Utils`ProdGrams
 		subtractMaps(p1, p2) == if p1 = {|->} or dom p1 inter dom p2 = {} then {|->}
 			else let v in set (dom p1 inter dom p2) in ( p1 ++ {v |-> p1(v) - p2(v)}) ++ subtractMaps({v} <-: p1, {v} <-: p2)
@@ -24,7 +30,8 @@ functions
 			if v in set dom p2 then p1(v) >= p2(v) else true;
 		
 operations
-
+	--Constructor
+	--loc: name of the location of the collective
 	public Collective: Utils`string ==> Collective
 		Collective(loc) == (
 			location:= loc;
@@ -32,8 +39,10 @@ operations
 			return self;
 		)
 		pre len loc > 0
-		post location = loc and prodAvailability = {|->}; -- TODO ver se é preciso verificar os outros
+		post location = loc and prodAvailability = {|->};
 	
+	--Returns client from the set of clients in the collective
+	--cname: name of the client to be returned 
 	public getClient: Utils`string ==> Client
 		getClient(cname) == (
 			dcl cli: Client;
@@ -43,6 +52,9 @@ operations
 		pre exists1 cli in set clients & cli.name = cname
 		post RESULT.name = cname and RESULT in set clients;
 	
+	--Generates a basket of a certain size with the available products and quantities
+	--basketType: size of the basket to be generated
+	--currProds: products available to be used in baskets
 	public generateBasket: Utils`BasketType * Utils`ProdGrams ==> Basket
 		generateBasket(basketType, curProds) == (
 			dcl n: nat1;
@@ -59,22 +71,30 @@ operations
 				minSize := minBig
 			);
 			for all prod in set dom curProds do(
+				--if collective has more than minSize of a product and it isn't in the basket and the basket doesn't have enough product variety
 				if curProds(prod) >= minSize and prod not in set dom ret.content and card dom ret.content < n
+				--add minSize of product into the basket
 				then ret.add(prod, minSize)
+				--if collective has less than minSize of a product and it isn't in the basket and the basket doesn't have enough product variety
 				else if curProds(prod) < minSize and prod not in set dom ret.content and card dom ret.content < n
 				then (
 					stopCycle := false;
 					for all p in set dom curProds do(
+						--if there'd be less left of product p than product prod in case they were put in the basket
 						if (curProds(p) - minSize) < (minSize - curProds(prod)) or stopCycle
 						then skip
+						--if p is already in the basket and there's more p left than the basket needs after all of prod has been added to the basket
 						else if p in set dom ret.content and ( curProds(p) - ret.getQuantity(p) ) >= (minSize - curProds(prod)) 
-						then (
+						then ( 
+							--product p will make up the rest of the weight that product prod can't
 							ret.updateProductQuantity(p, (minSize - curProds(prod)));
 							ret.add(prod, curProds(prod));
 							stopCycle := true;
 						)
+						--if p is not in the basket 
 						else if p not in set dom ret.content 
 						then (
+							--add all of product prod and enough of product p to make up prod's weight quota as well as its own weight quota 
 							ret.add(p, minSize + (minSize - curProds(prod)));
 							ret.add(prod, curProds(prod));
 							stopCycle := true
@@ -88,6 +108,8 @@ operations
 			then Basket`getTotalWeight(curProds) + 0.1 >= Utils`smallWeight
 			else Basket`getTotalWeight(curProds) + 0.1 >= Utils`bigWeight;
 	
+	--Generate a basket for each client on the collective with generateBasket()
+	--All baskets are added to the collective's seq of baskets and their contents are subtracted from the map of available products
 	public createBaskets: () ==> ()
 		createBaskets() == (
 		dcl curProds: Utils`ProdGrams := prodAvailability;
@@ -102,6 +124,10 @@ operations
 		pre smallBaskets + bigBaskets > 0
 		post baskets <> [] and card elems baskets = smallBaskets + bigBaskets;
 	 
+	--Checks if it's possible to add a new client to the collective, considering the available products
+	--It will check whether it's possible to have a certain number of small and big baskets
+	--small: possible number of small baskets
+	--big: possible number of big baskets
 	public canAddAssociate: nat * nat ==> bool
 		canAddAssociate(small, big) == (
 			dcl curProds: Utils`ProdGrams := prodAvailability;
@@ -139,6 +165,9 @@ operations
 		)
 		pre small + big > 0;
 	
+	--Adds a client to the collective, if possible
+	--If it's not possible to add the client, due to insufficient product availability, the client will be added to the waitlist
+	--cli: client to add to collective
   public addAssociate : Client ==> bool
   	addAssociate(cli) == (
   		if cli.basketRequest = <Small> and canAddAssociate(smallBaskets +1, bigBaskets)
@@ -168,6 +197,8 @@ operations
   		if cli in set clients then (smallBaskets = smallBaskets~ + 1 or bigBaskets = bigBaskets~ + 1)
   		else (smallBaskets = smallBaskets~ and bigBaskets = bigBaskets~ and cli in set elems waiting.contents);
 
+	--Removes client from collective. Also removes their requested basket from the collective
+	--cli: client to be removed from collective
   public removeAssociate : Client ==> ()
   	removeAssociate(cli) == (
   		if cli.basketRequest = <Small>
@@ -186,6 +217,9 @@ operations
     	if cli.basketRequest = <Small> then smallBaskets = smallBaskets~ - 1
     	else bigBaskets = bigBaskets~ - 1;
 	
+	--Accepts a client who's been waitlisted, if the product availability allows. That is, if the collective
+	-- can supply the basket size the client asked for
+	--Always accepts the first client to be added to the waitlist
 	public addFromWaitingList: () ==> bool
 		addFromWaitingList() == (
 			dcl nextCli: Client := waiting.top();
@@ -207,7 +241,9 @@ operations
 			then (waiting.contents = tl waiting~.contents and hd waiting~.contents in set clients )
 			else ( waiting.contents = waiting~.contents and clients~ = clients );
 	
-	-- remover clientes em excesso
+	--Remove excess clients after a farmer leaves the collective
+	--It's possible that no client is removed after this is called, 
+	-- if the collective can still support all the basket requests with the new set of farmers
 	public kickClients: () ==> ()
 		kickClients() == (
 			dcl size: nat1 := 1;
@@ -226,6 +262,8 @@ operations
 		post forall cli in set clients~ \ clients &
 			cli in set elems waiting.contents and cli not in set clients;
 	
+	--Returns the farmer with the name in the paramaters
+	--fname: name of the farmer to return
 	public getFarmer: Utils`string ==> Farmer
 		getFarmer(fname) == (
 			dcl farmer: Farmer;
@@ -235,6 +273,8 @@ operations
 		pre exists1 farmer in set farmers & farmer.name = fname
 		post RESULT.name = fname and RESULT in set farmers;
 	
+	--Adds a farmer to the collective, along with their available production
+	--farmer: farmer to be added to the collective
   public addFarmer : Farmer ==> ()
   	addFarmer(farmer) == (
   		farmers := farmers union {farmer};
@@ -252,6 +292,8 @@ operations
   		then prodAvailability(prod) = farmer.production(prod)
   		else prodAvailability(prod) = farmer.production(prod)+prodAvailability~(prod);
 
+	--Removes farmer from collective, along with their available production
+	--farmer: farmer to be removed from collective
   public removeFarmer : Farmer ==> ()
   	removeFarmer(farmer) == ( 
   		farmers := farmers \ {farmer};
@@ -268,19 +310,26 @@ operations
   		then prod not in set dom prodAvailability
   		else prodAvailability(prod) = prodAvailability~(prod) - farmer.production(prod);
 
+	--Return the client's basket, and remove it from the list of the week's baskets
+	--If the client already has collected the weekly basket, or 
+	--cl: client who's basket will be collected
 	public collectBasket : Client ==>  Basket  
   collectBasket(cl) == (
   
     dcl basketSet: set of Basket := elems baskets;  
+    
+    --products for placeholder basket
 		dcl p1: Product := new Product("apple");
 		dcl p2: Product := new Product("banana");
 		
     if cl.hasCancelled then(
     	cl.setUndefinedBasket(true); 
+    	--return placeholder
     	return (new Basket({p1|->100, p2|->300}, <Big>));
     );
     if cl.hasCollected then(
     	cl.setUndefinedBasket(false); 
+    	--return placeholder 
     	return (new Basket({p1|->100, p2|->300}, <Big>));
     );
     
@@ -312,6 +361,7 @@ operations
    				then cl.undefinedBasket = false 
   				else cl.undefinedBasket = true ;
   						
+  --Simulates a new year. Every client will have 4 variables reset: hasPaidAnual, hasCancelled, hasCollected and undefinedBasket
   public newYear: () ==> ()
   	newYear() == 
   		for all cli in set clients do cli.newYear()
@@ -321,6 +371,8 @@ operations
   				cli.hasCollected = false and
   				cli.undefinedBasket = true;
   				
+  
+  --Simulates a new year. Every client will have 4 variables reset: hasPaidAnual, hasCancelled, hasCollected and undefinedBasket
    public newWeek: () ==> ()
   	newWeek() == 
   		for all cli in set clients do cli.newWeek()

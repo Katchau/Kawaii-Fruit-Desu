@@ -1,4 +1,8 @@
 class Client
+/*
+	Represents a client. Clients apply to Collectives and once they're in they can collect or cancel their weekly baskets, as well as 
+	quit their Collective.
+*/
 instance variables
   public name: Utils`string;
   public hasPaidAnual: bool; 
@@ -6,11 +10,14 @@ instance variables
   public hasCancelled: bool; 
   public undefinedCollective: bool; 
   public collective: Collective; 
-  public undefinedBasket: bool;
+  public undefinedBasket: bool; 
   public basketReceived: Basket; 
   public basketRequest: Utils`BasketType; 
 
 operations
+	--Constructor
+	--n: client name
+	--type: size of the basket the client is going to receive every week
 	public Client: Utils`string * Utils`BasketType ==> Client
 		Client(n, type) == ( 
       name := n; 
@@ -26,54 +33,71 @@ operations
 		pre len n > 0
 		post name = n and basketRequest = type;
 
-   public applyCollective : Collective ==> bool 
- 	 applyCollective(c) == (
+	--Client applies to a collective. There's a possibility they will be waitlisted
+	--c: collective to apply to
+  public applyCollective : Collective ==> bool 
+ 		applyCollective(c) == (
 			undefinedCollective := not c.addAssociate(self);
 			collective := c;
 			return not (undefinedCollective)
-   )
-   post undefinedCollective = false;
+   	)
+   post if undefinedCollective = false 
+   			then collective = c 
+   			else undefinedCollective = true;
 
+	--Client gets their weekly basket. The client must not have cancelled the week's basket or have collected another basket that week
+	--After getBasket(), 'basketReceived' will hold the client's basket and it will be gone from the Collective's basket sep
   public  getBasket : ()  ==> () 
-  getBasket() ==  (
-  	dcl possibleBasket: Basket;
+  	getBasket() ==  (
+  		dcl possibleBasket: Basket;
   
-  	possibleBasket := collective.collectBasket(self);
+  		possibleBasket := collective.collectBasket(self);
   	
-    if not undefinedBasket
-   		 then basketReceived := possibleBasket
+  	  if not undefinedBasket
+   			 then basketReceived := possibleBasket
     )
   pre hasCollected = false and not undefinedCollective = true
   post if hasCollected = true then (not undefinedBasket and hasCollected )
   				else (undefinedBasket and not hasCollected); 
 
-	 public  quitCollective : ()  ==> bool
-  quitCollective() == (
-  	collective.removeAssociate(self);
-  	return undefinedCollective;
-  )
+	--Client leaves collective
+	public  quitCollective : ()  ==> bool
+  	quitCollective() == (
+  		collective.removeAssociate(self);
+  		return undefinedCollective;
+  	)
   pre undefinedCollective = false
   post undefinedCollective = true;
 
+	--Client cancels weekly basket. This value will reset every week
   public cancelBasket : ()  ==> () 
-  cancelBasket() == hasCancelled := true 
+  	cancelBasket() == hasCancelled := true 
   post hasCancelled = true; 
 
+	--Client collects weekly basket. This value will reset every week
 	public setHasCollected: bool ==> () 
-  setHasCollected(hc) == hasCollected := hc 
+  	setHasCollected(hc) == hasCollected := hc 
   post hasCollected = hc; 
   
+  --Set 'undefinedCollective' to true when the client has no collective and to false if they do
+  --uc: value to set 'undefinedCollective' to
 	public setUndefinedCollective: bool ==> () 
-  setUndefinedCollective(uc) == undefinedCollective := uc 
+  	setUndefinedCollective(uc) == undefinedCollective := uc 
   post undefinedCollective = uc; 
   
+  --Set 'undefinedBasket' to true if the client hasn't picked up their weekly basket and to false if they have
+  --ub: value to set 'undefinedBasket' to
   public setUndefinedBasket: bool ==> () 
-  setUndefinedBasket(ub) == undefinedBasket:= ub 
+  	setUndefinedBasket(ub) == undefinedBasket:= ub 
   post undefinedBasket = ub; 
   
+  --Call to start a new week
+  --Resets 'hasCollected', 'hasCanceled' and 'undefinedBasket' to their default values
   public newWeek: () ==> ()
   newWeek() == (hasCollected := false; hasCancelled := false; undefinedBasket := true);
   
+  --Call to start a new year
+  --Resets 'hasCollected', 'hasCanceled', 'undefinedBasket' and 'hasPaidAnual' to their default values
   public newYear: () ==> ()
   newYear() == (hasCollected := false; hasCancelled := false; undefinedBasket := true; hasPaidAnual := false);
 

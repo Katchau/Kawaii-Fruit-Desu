@@ -1,8 +1,13 @@
 class Product
+/*
+	Represents a fruit or vegetable supplied by the producers
+*/
 instance variables
   public name: Utils`string;
 
 operations
+	--Constructor
+	--n: product name
 	public Product: Utils`string ==> Product
 	Product(n) == (
 		name := n;
@@ -11,6 +16,8 @@ operations
 	pre len n > 0
 	post name = n;
 	
+	--Compares two products using their name
+	--prod: product to be compared
   public pure is_equal : Product ==> bool
   	is_equal(prod) == Utils`stringsEquals(name, prod.name)
   	pre prod <> undefined
