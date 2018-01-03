@@ -109,7 +109,7 @@ public class Main {
     public static void collectiveMenu(){
         System.out.print("\033[H\033[2J");
         System.out.println("Collectve Menu");
-        System.out.println("Please select a desired function! (1/6)");
+        System.out.println("Please select a desired function! (1/5)");
         int option;
         boolean invalid = false;
         while(!invalid){
