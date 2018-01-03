@@ -38,12 +38,12 @@ operations
   public applyCollective : Collective ==> bool 
  		applyCollective(c) == (
 			undefinedCollective := not c.addAssociate(self);
+			undefinedCollective := false;
 			collective := c;
 			return not (undefinedCollective)
    	)
-   post if undefinedCollective = false 
-   			then collective = c 
-   			else undefinedCollective = true;
+   pre undefinedCollective
+   post not undefinedCollective;
 
 	--Client gets their weekly basket. The client must not have cancelled the week's basket or have collected another basket that week
 	--After getBasket(), 'basketReceived' will hold the client's basket and it will be gone from the Collective's basket sep

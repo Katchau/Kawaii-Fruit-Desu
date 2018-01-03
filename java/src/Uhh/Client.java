@@ -34,6 +34,7 @@ public class Client {
   public Boolean applyCollective(final Collective c) {
 
     undefinedCollective = !(c.addAssociate(this));
+    undefinedCollective = false;
     collective = c;
     return !(undefinedCollective);
   }
