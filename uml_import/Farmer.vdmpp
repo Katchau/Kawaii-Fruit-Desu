@@ -6,6 +6,9 @@ instance variables
   public hasCollective: bool := false;
 
 operations
+	--Construtor 
+	--n: name of the farmer to be added
+	--prods: map of products and quantities the farmer can supply
 	public Farmer: Utils`string * Utils`ProdGrams ==> Farmer
 		Farmer(n, prods) == (
 			name := n;
@@ -15,6 +18,8 @@ operations
 	pre prods <> {|->} and forall gr in set rng prods & gr > 0
 	post name = n and prods = production;
 
+	--Sets hasCollective to true and changes 'collective'
+	--cl: collective the farmer will supply
   public apply : Collective  ==> ()
   	apply(cl) == (
   		hasCollective := true;
@@ -23,6 +28,7 @@ operations
   	pre hasCollective = false
   	post hasCollective and collective = cl;
 
+	--Sets hasCollective to false and changes 'collective' to a placeholder
   public  quit : ()  ==> ()
   	quit() == (
   		hasCollective := false;
@@ -31,6 +37,8 @@ operations
   	pre hasCollective
   	post not hasCollective and collective.location = "fake";
    
+  --Updates collective info on the available supply from this farmer
+  --This is done by removing and adding the farmer back into the same collective
   public updateCollectiveInfo: () ==> ()
   	updateCollectiveInfo() == (
   		dcl cl: Collective := collective;
@@ -40,11 +48,13 @@ operations
   	pre hasCollective
   	post hasCollective;
   
+  --Adds a product and its quantity to 'production'
   public addProduct: Product * real ==> ()
   	addProduct(prod, gr) == production := production ++ {prod |-> gr}
   	pre prod not in set dom production and gr > 0
   	post production = production~ ++ {prod |-> gr} and prod in set dom production and gr = production(prod);
 
+  --Removes a product and its quantity from 'production'
 	public removeProduct: Product ==> ()
 		removeProduct(prod) == production := {prod} <-: production
 		pre prod in set dom production
